@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hi Fusion · Social Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f14;--surface:#14171f;--surface2:#1a1e28;--surface3:#1f2330;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.11);
+  --text:#e8eaf0;--muted:#6b7280;--muted2:#9ca3af;
+  --alo:#ff6b35;--alo-dim:rgba(255,107,53,0.12);
+  --todays:#3eb8f0;--todays-dim:rgba(62,184,240,0.12);
+  --fine:#a78bfa;--fine-dim:rgba(167,139,250,0.12);
+  --positive:#34d399;--negative:#f87171;--warn:#fbbf24;
+  --fb:#1877f2;--tt:#ff0050;--ig:#e1306c;--th:#888780;--zl:#0068ff;
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:13px;}
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-logo{padding:16px 18px 12px;border-bottom:1px solid var(--border);}
+.sb-logo .brand{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;}
+.sb-logo .brand em{color:var(--alo);font-style:normal;}
+.sb-logo .sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.sb-section{padding:14px 14px 6px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:0 6px 2px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .15s;border:1px solid transparent;}
+.sb-item:hover{background:var(--surface2);color:var(--text);}
+.sb-item.active{background:rgba(255,107,53,.12);color:var(--alo);border-color:rgba(255,107,53,.2);}
+.sb-item .ico{width:15px;text-align:center;font-size:13px;flex-shrink:0;}
+.sb-item .bdg{margin-left:auto;font-size:10px;background:var(--surface3);padding:1px 6px;border-radius:9px;font-family:'DM Mono',monospace;}
+.sb-item.active .bdg{background:rgba(255,107,53,.2);color:var(--alo);}
+.sb-divider{height:1px;background:var(--border);margin:8px 12px;}
+.sb-brand-filter{padding:6px 12px 8px;}
+.sb-bf-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
+.sb-brand-btn{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s;margin-bottom:2px;border:1px solid transparent;}
+.sb-brand-btn:hover{background:var(--surface2);}
+.sb-brand-btn.active{color:var(--text);}
+.sb-brand-btn[data-b="ALL"].active{background:rgba(255,255,255,.04);}
+.sb-brand-btn[data-b="ALO"].active{background:var(--alo-dim);color:var(--alo);border-color:rgba(255,107,53,.2);}
+.sb-brand-btn[data-b="TODAYS"].active{background:var(--todays-dim);color:var(--todays);border-color:rgba(62,184,240,.2);}
+.sb-brand-btn[data-b="FINE"].active{background:var(--fine-dim);color:var(--fine);border-color:rgba(167,139,250,.2);}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-bottom{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);}
+.sb-member{display:flex;align-items:center;gap:7px;padding:4px 0;}
+.sb-avatar{width:24px;height:24px;border-radius:50%;background:rgba(62,184,240,.15);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--todays);flex-shrink:0;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* TOP BAR */
+.topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;flex-wrap:wrap;}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;white-space:nowrap;}
+.topbar-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+.quick-tabs{display:flex;gap:2px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:2px;}
+.qt-btn{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.qt-btn.active{background:var(--alo);color:#fff;}
+.plat-filters{display:flex;gap:3px;}
+.pf-btn{display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:5px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.pf-btn .d{width:6px;height:6px;border-radius:50%;}
+.pf-btn.active{border-color:rgba(255,255,255,.18);color:var(--text);}
+.pf-btn[data-p="FB"].active{color:var(--fb);background:rgba(24,119,242,.12);}
+.pf-btn[data-p="TT"].active{color:var(--tt);background:rgba(255,0,80,.12);}
+.pf-btn[data-p="IG"].active{color:var(--ig);background:rgba(225,48,108,.12);}
+.pf-btn[data-p="TH"].active{color:#aaa;background:rgba(136,135,128,.15);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.date-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--bg);padding:3px 9px;border-radius:5px;border:1px solid var(--border);white-space:nowrap;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--positive);animation:pulse 2s infinite;flex-shrink:0;}
+
+/* PAGES */
+.page{flex:1;overflow-y:auto;padding:16px 20px;display:none;}
+.page.active{display:block;}
+
+/* SECTION LABEL */
+.sl{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sl::after{content:'';flex:1;height:1px;background:var(--border);}
+.sl em{font-size:9px;font-family:'DM Sans',sans-serif;letter-spacing:1px;font-weight:400;font-style:normal;}
+
+/* KPI GRID */
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px;}
+.kc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s,transform .15s;}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kc[data-brand="ALO"]::before{background:var(--alo);}
+.kc[data-brand="TODAYS"]::before{background:var(--todays);}
+.kc[data-brand="FINE"]::before{background:var(--fine);}
+.kc:hover{border-color:var(--border2);transform:translateY(-1px);}
+.ktop{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.btag{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;}
+.ta{background:var(--alo-dim);color:var(--alo);}
+.tt2{background:var(--todays-dim);color:var(--todays);}
+.tf{background:var(--fine-dim);color:var(--fine);}
+.tall{background:rgba(255,255,255,.06);color:var(--muted2);}
+.ktit{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.kval{font-family:'Bebas Neue',sans-serif;font-size:27px;line-height:1;color:var(--text);}
+.kdelta{font-size:10px;color:var(--muted);margin-top:3px;}
+.up{color:var(--positive);}.dn{color:var(--negative);}
+
+/* CHARTS ROW */
+.cr{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px;margin-bottom:12px;}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;}
+.ct{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.cs{font-size:10px;color:var(--muted);margin-bottom:9px;}
+
+/* SENTIMENT */
+.srow{display:flex;flex-direction:column;gap:11px;}
+.sbar{height:6px;border-radius:4px;background:var(--surface2);overflow:hidden;display:flex;}
+.sp{background:var(--positive);border-radius:4px 0 0 4px;}
+.sn{background:var(--negative);}
+.slbls{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* DONUT */
+.dw{display:flex;align-items:center;gap:11px;}
+.dl{display:flex;flex-direction:column;gap:5px;flex:1;}
+.lr{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.lv{font-family:'DM Mono',monospace;color:var(--text);margin-left:auto;font-size:11px;}
+
+/* VVR */
+.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px;}
+.vi{background:var(--surface2);border-radius:7px;padding:8px;text-align:center;}
+.vb{font-size:9px;font-weight:700;letter-spacing:1px;margin-bottom:3px;}
+.vv{font-family:'Bebas Neue',sans-serif;font-size:21px;}
+.vl{font-size:9px;color:var(--muted);}
+
+/* TABLE */
+.tw{overflow-x:auto;}
+.dt{width:100%;border-collapse:collapse;font-size:11px;}
+.dt th{color:var(--muted);font-weight:500;text-align:left;padding:6px 9px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.dt td{padding:6px 9px;border-bottom:1px solid rgba(255,255,255,.025);vertical-align:middle;}
+.dt tr:last-child td{border-bottom:none;}
+.dt tr:hover td{background:var(--surface2);}
+.pill{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.5px;}
+.pa{background:var(--alo-dim);color:var(--alo);}
+.pt{background:var(--todays-dim);color:var(--todays);}
+.pf{background:var(--fine-dim);color:var(--fine);}
+.ptag{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.pFB{background:rgba(24,119,242,.15);color:var(--fb);}
+.pTT{background:rgba(255,0,80,.15);color:var(--tt);}
+.pIG{background:rgba(225,48,108,.15);color:var(--ig);}
+.pTH{background:rgba(136,135,128,.15);color:#aaa;}
+.pZL{background:rgba(0,104,255,.15);color:var(--zl);}
+.nm{font-family:'DM Mono',monospace;color:var(--text);}
+.ng{font-family:'DM Mono',monospace;color:var(--positive);}
+.nr{font-family:'DM Mono',monospace;color:var(--negative);}
+.nw{font-family:'DM Mono',monospace;color:var(--warn);}
+.ra{text-align:right !important;}
+
+/* PLATFORM CARDS */
+.pk{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px;}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 13px;transition:border-color .2s;}
+.pc:hover{border-color:var(--border2);}
+.pch{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.pico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.pnm{font-size:11px;font-weight:600;}
+.psub{font-size:9px;color:var(--muted);}
+.preachlbl{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.preach{font-family:'Bebas Neue',sans-serif;font-size:21px;line-height:1;}
+.pmg{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:7px;}
+.pm{background:var(--surface2);border-radius:5px;padding:4px 6px;}
+.pml{font-size:9px;color:var(--muted);margin-bottom:1px;}
+.pmv{font-family:'DM Mono',monospace;font-size:10px;}
+
+/* POST MANAGEMENT */
+.pm-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.pm-search{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 11px;border-radius:7px;outline:none;width:200px;transition:border-color .15s;}
+.pm-search:focus{border-color:rgba(255,107,53,.4);}
+.pm-search::placeholder{color:var(--muted);}
+.pm-filter{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;padding:6px 9px;border-radius:7px;outline:none;cursor:pointer;}
+.pm-filter option{background:var(--surface2);}
+.pm-count{font-size:10px;color:var(--muted);margin-left:auto;font-family:'DM Mono',monospace;}
+.status-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+.st-posted{background:rgba(52,211,153,.12);color:var(--positive);}
+.st-review{background:rgba(251,191,36,.12);color:var(--warn);}
+.st-wip{background:rgba(62,184,240,.12);color:var(--todays);}
+.st-todo{background:rgba(107,114,128,.12);color:var(--muted2);}
+.ch-badge{display:inline-block;padding:2px 7px;border-radius:9px;font-size:10px;font-weight:700;}
+.ch-TikTok{background:rgba(255,0,80,.15);color:var(--tt);}
+.ch-Facebook{background:rgba(24,119,242,.15);color:var(--fb);}
+.ch-Instagram{background:rgba(225,48,108,.15);color:var(--ig);}
+.ch-Threads{background:rgba(136,135,128,.2);color:#bbb;}
+.ch-Zalo{background:rgba(0,104,255,.15);color:var(--zl);}
+.btn-del{background:none;border:1px solid rgba(255,255,255,.06);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;padding:2px 8px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.btn-del:hover{background:rgba(248,113,113,.1);color:var(--negative);border-color:rgba(248,113,113,.3);}
+
+/* POST KPI */
+.post-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px;}
+.pkpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;}
+.pkpi-label{font-size:10px;color:var(--muted);margin-bottom:3px;}
+.pkpi-val{font-family:'Bebas Neue',sans-serif;font-size:23px;line-height:1;}
+.pkpi-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* ADD FORM */
+.add-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:15px 17px;margin-bottom:12px;}
+.form-title{font-size:12px;font-weight:600;margin-bottom:11px;color:var(--text);}
+.form-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:7px;align-items:end;}
+.form-field{display:flex;flex-direction:column;gap:4px;}
+.form-label{font-size:9px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.form-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:6px 9px;border-radius:6px;outline:none;width:100%;transition:border-color .15s;}
+.form-input:focus{border-color:rgba(255,107,53,.4);}
+.form-input::placeholder{color:var(--muted);}
+.form-input option{background:var(--surface2);}
+.btn-add{background:var(--alo);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;border-radius:6px;cursor:pointer;transition:opacity .15s;white-space:nowrap;}
+.btn-add:hover{opacity:.85;}
+.btn-reset{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 12px;border-radius:6px;cursor:pointer;}
+.btn-reset:hover{color:var(--text);}
+.toast{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:var(--positive);font-size:11px;padding:4px 11px;border-radius:5px;display:none;}
+.toast.show{display:inline-block;}
+
+/* MINI BAR */
+.mini-bar-wrap{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.mini-bar-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;}
+.mb-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.mb-label{font-size:11px;color:var(--muted2);width:76px;flex-shrink:0;}
+.mb-bar-bg{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.mb-bar{height:100%;border-radius:3px;}
+.mb-val{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);width:20px;text-align:right;flex-shrink:0;}
+
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+@media(max-width:1200px){.kg,.pk{grid-template-columns:repeat(3,1fr);}.cr{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr 1fr 1fr;}}
+@media(max-width:900px){.kg{grid-template-columns:repeat(2,1fr);}.cr,.mini-bar-wrap{grid-template-columns:1fr;}}
+
+/* ── IMPORT PAGE ── */
+.import-drop-zone{border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:rgba(255,255,255,.015);}
+.import-drop-zone:hover,.import-drop-zone.dragover{border-color:var(--alo);background:rgba(255,107,53,.06);}
+.import-drop-zone.dragover{transform:scale(1.01);}
+.dz-icon{font-size:32px;margin-bottom:10px;opacity:.5;}
+.dz-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.dz-sub{font-size:11px;color:var(--muted);}
+.dz-formats{display:inline-flex;gap:6px;margin-top:10px;}
+.dz-fmt{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:4px;background:var(--surface2);color:var(--muted2);border:1px solid var(--border);}
+.import-config{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.import-config .form-field{display:flex;flex-direction:column;gap:5px;}
+.import-config .form-label{font-size:9px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.import-config .form-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 10px;border-radius:7px;outline:none;transition:border-color .15s;}
+.import-config .form-input:focus{border-color:rgba(255,107,53,.4);}
+.import-config .form-input option{background:var(--surface2);}
+.btn-import{background:var(--alo);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:8px 20px;border-radius:7px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.btn-import:hover{opacity:.88;}
+.btn-import:disabled{opacity:.4;cursor:not-allowed;}
+.import-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-top:14px;overflow:hidden;}
+.import-preview-header{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--border);}
+.import-preview-title{font-size:12px;font-weight:600;}
+.import-badge{font-size:10px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:5px;background:rgba(52,211,153,.12);color:var(--positive);}
+.import-badge.warn{background:rgba(251,191,36,.12);color:var(--warn);}
+.import-badge.err{background:rgba(248,113,113,.12);color:var(--negative);}
+.col-map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px;}
+.col-map-item{background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+.col-map-item.matched{border-color:rgba(52,211,153,.3);}
+.col-map-item.missing{border-color:rgba(248,113,113,.2);background:rgba(248,113,113,.04);}
+.col-map-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.col-map-val{font-size:11px;font-weight:600;}
+.col-map-val.ok{color:var(--positive);}
+.col-map-val.miss{color:var(--negative);}
+.col-map-val.warn{color:var(--warn);}
+.import-log{padding:12px 15px;border-top:1px solid var(--border);max-height:130px;overflow-y:auto;}
+.log-entry{display:flex;align-items:flex-start;gap:7px;padding:3px 0;font-size:11px;color:var(--muted);}
+.log-entry.ok{color:var(--positive);}
+.log-entry.warn{color:var(--warn);}
+.log-entry.err{color:var(--negative);}
+.log-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.log-entry.ok .log-dot{background:var(--positive);}
+.log-entry.warn .log-dot{background:var(--warn);}
+.log-entry.err .log-dot{background:var(--negative);}
+.history-table{width:100%;border-collapse:collapse;font-size:11px;}
+.history-table th{color:var(--muted);font-weight:500;text-align:left;padding:7px 12px;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+.history-table td{padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.025);}
+.history-table tr:last-child td{border-bottom:none;}
+.history-table tr:hover td{background:var(--surface2);}
+.import-success-banner{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;display:none;}
+.import-success-banner.show{display:flex;}
+.file-info-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;display:none;}
+.file-info-chip.show{display:flex;}
+.fi-icon{width:34px;height:34px;background:rgba(255,107,53,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.fi-name{font-size:12px;font-weight:600;color:var(--text);}
+.fi-meta{font-size:10px;color:var(--muted);}
+.fi-clear{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color .15s;}
+.fi-clear:hover{color:var(--negative);}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.import-preview{animation:slideIn .25s ease both;}
+
+/* ── LOGIN OVERLAY ── */
+body.not-authed .app{display:none;}
+#login-overlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,rgba(255,107,53,.10),transparent),var(--bg);}
+body.not-authed #login-overlay{display:flex;}
+.login-card{width:340px;max-width:92vw;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.45);}
+.login-brand{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:2px;}
+.login-brand em{color:var(--alo);font-style:normal;}
+.login-sub{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:22px;}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px;}
+.login-field label{font-size:10px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.login-field input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;border-radius:8px;outline:none;transition:border-color .15s;}
+.login-field input:focus{border-color:rgba(255,107,53,.5);}
+.login-btn{width:100%;background:var(--alo);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:11px;border-radius:8px;cursor:pointer;margin-top:6px;transition:opacity .15s;}
+.login-btn:hover{opacity:.9;}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-err{font-size:11px;color:var(--negative);min-height:16px;margin-top:10px;text-align:center;}
+.login-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6;}
+
+/* ── DAILY ENTRY ── */
+.entry-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 18px 6px;}
+.entry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.entry-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.entry-field.full{grid-column:1/-1;}
+.entry-field label{font-size:9px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.entry-field input,.entry-field select{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 11px;border-radius:8px;outline:none;transition:border-color .15s;}
+.entry-field input:focus,.entry-field select:focus{border-color:rgba(255,107,53,.45);}
+.entry-field select option{background:var(--surface2);}
+.entry-actions{display:flex;align-items:center;gap:12px;padding:6px 0 14px;}
+.entry-save{background:var(--positive);border:none;color:#04130c;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:10px 22px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:opacity .15s;}
+.entry-save:hover{opacity:.9;}
+.entry-save:disabled{opacity:.5;cursor:not-allowed;}
+.entry-msg{font-size:12px;}
+.entry-table{width:100%;border-collapse:collapse;font-size:12px;}
+.entry-table th{text-align:left;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:9px 12px;border-bottom:1px solid var(--border);font-weight:600;}
+.entry-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--muted2);}
+.entry-table tr:hover td{background:var(--surface2);}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:11px 18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:all .25s;z-index:10000;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.sb-logout{display:flex;align-items:center;gap:7px;padding:7px 9px;margin-top:8px;border-radius:7px;cursor:pointer;font-size:11px;color:var(--muted);border:1px solid var(--border);transition:all .15s;}
+.sb-logout:hover{background:var(--surface2);color:var(--text);}
+</style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Supabase: thư viện đăng nhập + lưu dữ liệu chung -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* ⚠️⚠️ DÁN 2 GIÁ TRỊ TỪ SUPABASE VÀO ĐÂY (xem hướng dẫn cài đặt) ⚠️⚠️
+     Lấy tại: Supabase → Project Settings → API
+       - Project URL  →  dán vào SUPABASE_URL
+       - anon public key  →  dán vào SUPABASE_ANON_KEY                       */
+  const SUPABASE_URL      = 'https://YOUR-PROJECT-ID.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+</script>
+<body class="not-authed">
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-brand">Hi Fusion <em>|</em></div>
+    <div class="login-sub">Social Command Center</div>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="ban@hifusion.vn" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Mật khẩu</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Đăng nhập</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">Tài khoản do quản lý team cấp.<br>Quên mật khẩu? Liên hệ trưởng nhóm.</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="brand">Hi Fusion <em>|</em></div>
+    <div class="sub">Social Command Center</div>
+  </div>
+  <div class="sb-section">Analytics</div>
+  <div class="sb-item active" data-page="analytics" onclick="switchPage('analytics',this)">
+    <span class="ico">📊</span><span>Performance</span>
+  </div>
+  <div class="sb-item" data-page="platform" onclick="switchPage('platform',this)">
+    <span class="ico">📡</span><span>Platforms</span>
+  </div>
+  <div class="sb-section">Content</div>
+  <div class="sb-item" data-page="posts" onclick="switchPage('posts',this)">
+    <span class="ico">📝</span><span>Bài đăng</span>
+    <span class="bdg" id="post-count-badge">8</span>
+  </div>
+  <div class="sb-item" data-page="create" onclick="switchPage('create',this)">
+    <span class="ico">✏️</span><span>Thêm bài mới</span>
+  </div>
+  <div class="sb-item" data-page="import" onclick="switchPage('import',this)">
+    <span class="ico">📥</span><span>Import Metrics</span>
+  </div>
+  <div class="sb-item" data-page="entry" onclick="switchPage('entry',this)">
+    <span class="ico">📝</span><span>Nhập liệu hằng ngày</span>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-brand-filter">
+    <div class="sb-bf-label">Brand</div>
+    <div class="sb-brand-btn active" data-b="ALL" onclick="setBrand('ALL',this)">
+      <span class="sb-dot" style="background:var(--muted2)"></span>All brands
+    </div>
+    <div class="sb-brand-btn" data-b="ALO" onclick="setBrand('ALO',this)">
+      <span class="sb-dot" style="background:#f5c518"></span>ALO
+    </div>
+    <div class="sb-brand-btn" data-b="TODAYS" onclick="setBrand('TODAYS',this)">
+      <span class="sb-dot" style="background:#e53e3e"></span>Today's
+    </div>
+    <div class="sb-brand-btn" data-b="FINE" onclick="setBrand('FINE',this)">
+      <span class="sb-dot" style="background:#22c55e"></span>FINE
+    </div>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-member"><div class="sb-avatar" id="me-avatar">?</div><span id="me-name" style="font-size:11px;color:var(--muted2)">Đang tải…</span></div>
+    <div class="sb-logout" onclick="doLogout()"><span>🚪</span><span>Đăng xuất</span></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <span class="live-dot"></span>
+    <span class="topbar-title" id="topbar-title">Performance Dashboard</span>
+    <div class="topbar-sep"></div>
+    <div class="quick-tabs" id="quickTabs">
+      <button class="qt-btn" data-q="today">Today</button>
+      <button class="qt-btn" data-q="week">Week</button>
+      <button class="qt-btn active" data-q="month">Month</button>
+      <button class="qt-btn" data-q="quarter">Quarter</button>
+      <button class="qt-btn" data-q="ytd">YTD</button>
+    </div>
+    <div class="plat-filters" id="platFlt">
+      <button class="pf-btn active" data-p="ALL"><span class="d" style="background:var(--muted2)"></span>All</button>
+      <button class="pf-btn" data-p="FB"><span class="d" style="background:var(--fb)"></span>Facebook</button>
+      <button class="pf-btn" data-p="TT"><span class="d" style="background:var(--tt)"></span>TikTok</button>
+      <button class="pf-btn" data-p="IG"><span class="d" style="background:var(--ig)"></span>Instagram</button>
+      <button class="pf-btn" data-p="TH"><span class="d" style="background:var(--th)"></span>Threads</button>
+    </div>
+    <div class="topbar-right">
+      <span class="date-badge" id="topbar-date">📅 Mar/2026</span>
+    </div>
+  </div>
+
+  <!-- PAGE: ANALYTICS -->
+  <div class="page active" id="page-analytics">
+    <div class="sl">Brand Performance <em>· Executive Overview</em></div>
+    <div class="kg">
+      <div class="kc" data-brand="ALO">
+        <div class="ktop"><span class="btag ta">ALO</span><span style="font-size:9px;color:var(--muted)" id="rp-alo">All platforms</span></div>
+        <div class="ktit">Total Reach</div>
+        <div class="kval" id="rv-alo">1.24M</div>
+        <div class="kdelta"><span class="up" id="rd-alo">↑ +18%</span> vs prior</div>
+      </div>
+      <div class="kc" data-brand="TODAYS">
+        <div class="ktop"><span class="btag tt2">TODAY'S</span></div>
+        <div class="ktit">Total Reach</div>
+        <div class="kval" id="rv-td">892K</div>
+        <div class="kdelta"><span class="up" id="rd-td">↑ +9%</span> vs prior</div>
+      </div>
+      <div class="kc" data-brand="FINE">
+        <div class="ktop"><span class="btag tf">FINE</span></div>
+        <div class="ktit">Total Reach</div>
+        <div class="kval" id="rv-fn">675K</div>
+        <div class="kdelta"><span class="dn" id="rd-fn">↓ -3%</span> vs prior</div>
+      </div>
+      <div class="kc" id="combined-card" style="border-color:rgba(255,255,255,.1)">
+        <div class="ktop"><span class="btag tall" id="combined-tag">ALL BRANDS</span></div>
+        <div class="ktit" id="combined-tit">3 Brands Combined</div>
+        <div class="kval" style="color:var(--alo)" id="rv-all">2.81M</div>
+        <div class="kdelta"><span class="up" id="rd-all">↑ +10.5%</span> combined</div>
+      </div>
+    </div>
+
+    <div class="cr">
+      <div class="cc">
+        <div class="ct">Total Reach – Trend Over Time</div>
+        <div class="cs" id="chartLbl">Bar chart · Sep/2025 – Feb/2026</div>
+        <svg viewBox="0 0 480 175" style="width:100%">
+          <line x1="44" y1="10" x2="44" y2="142" stroke="#1e2230" stroke-width="1"/>
+          <line x1="44" y1="142" x2="476" y2="142" stroke="#1e2230" stroke-width="1"/>
+          <line x1="44" y1="40" x2="476" y2="40" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="44" y1="70" x2="476" y2="70" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="44" y1="105" x2="476" y2="105" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="38" y="144" fill="#6b7280" font-size="9" text-anchor="end" font-family="DM Sans,sans-serif">0</text>
+          <text x="38" y="108" fill="#6b7280" font-size="9" text-anchor="end" font-family="DM Sans,sans-serif">400K</text>
+          <text x="38" y="73"  fill="#6b7280" font-size="9" text-anchor="end" font-family="DM Sans,sans-serif">800K</text>
+          <text x="38" y="43"  fill="#6b7280" font-size="9" text-anchor="end" font-family="DM Sans,sans-serif">1.2M</text>
+          <rect x="55"  y="90"  width="13" height="52" rx="2" fill="var(--alo)" opacity=".8"/>
+          <rect x="124" y="82"  width="13" height="60" rx="2" fill="var(--alo)" opacity=".85"/>
+          <rect x="193" y="72"  width="13" height="70" rx="2" fill="var(--alo)" opacity=".9"/>
+          <rect x="262" y="60"  width="13" height="82" rx="2" fill="var(--alo)" opacity=".95"/>
+          <rect x="331" y="48"  width="13" height="94" rx="2" fill="var(--alo)"/>
+          <rect x="400" y="38"  width="13" height="104" rx="2" fill="var(--alo)"/>
+          <rect x="71"  y="100" width="13" height="42" rx="2" fill="var(--todays)" opacity=".8"/>
+          <rect x="140" y="95"  width="13" height="47" rx="2" fill="var(--todays)" opacity=".85"/>
+          <rect x="209" y="88"  width="13" height="54" rx="2" fill="var(--todays)" opacity=".9"/>
+          <rect x="278" y="80"  width="13" height="62" rx="2" fill="var(--todays)" opacity=".95"/>
+          <rect x="347" y="73"  width="13" height="69" rx="2" fill="var(--todays)"/>
+          <rect x="416" y="66"  width="13" height="76" rx="2" fill="var(--todays)"/>
+          <rect x="87"  y="112" width="13" height="30" rx="2" fill="var(--fine)" opacity=".8"/>
+          <rect x="156" y="108" width="13" height="34" rx="2" fill="var(--fine)" opacity=".85"/>
+          <rect x="225" y="105" width="13" height="37" rx="2" fill="var(--fine)" opacity=".9"/>
+          <rect x="294" y="100" width="13" height="42" rx="2" fill="var(--fine)" opacity=".95"/>
+          <rect x="363" y="96"  width="13" height="46" rx="2" fill="var(--fine)"/>
+          <rect x="432" y="90"  width="13" height="52" rx="2" fill="var(--fine)"/>
+          <text x="80"  y="157" fill="#6b7280" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Sep</text>
+          <text x="149" y="157" fill="#6b7280" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Oct</text>
+          <text x="218" y="157" fill="#6b7280" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Nov</text>
+          <text x="287" y="157" fill="#6b7280" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Dec</text>
+          <text x="356" y="157" fill="#6b7280" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Jan</text>
+          <text x="425" y="157" fill="#6b7280" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Feb</text>
+          <rect x="46"  y="167" width="8" height="8" rx="2" fill="var(--alo)"/>
+          <text x="58"  y="175" fill="#9ca3af" font-size="9" font-family="DM Sans,sans-serif">ALO</text>
+          <rect x="92"  y="167" width="8" height="8" rx="2" fill="var(--todays)"/>
+          <text x="104" y="175" fill="#9ca3af" font-size="9" font-family="DM Sans,sans-serif">Today's</text>
+          <rect x="152" y="167" width="8" height="8" rx="2" fill="var(--fine)"/>
+          <text x="164" y="175" fill="#9ca3af" font-size="9" font-family="DM Sans,sans-serif">FINE</text>
+        </svg>
+      </div>
+      <div class="cc">
+        <div class="ct">Sentiment Score</div>
+        <div class="cs">Positive / Negative ratio</div>
+        <div class="srow">
+          <div id="sent-row-alo">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="font-weight:600;color:var(--alo)">ALO</span><span id="sent-val-alo" class="ng">82%</span>
+            </div>
+            <div class="sbar"><div class="sp" id="sent-pos-alo" style="width:82%"></div><div class="sn" style="width:18%"></div></div>
+            <div class="slbls"><span id="sent-lpos-alo">✅ 82%</span><span id="sent-lneg-alo">❌ 18%</span></div>
+          </div>
+          <div id="sent-row-td">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="font-weight:600;color:var(--todays)">Today's</span><span id="sent-val-td" class="ng">76%</span>
+            </div>
+            <div class="sbar"><div class="sp" id="sent-pos-td" style="width:76%"></div><div class="sn" style="width:24%"></div></div>
+            <div class="slbls"><span id="sent-lpos-td">✅ 76%</span><span id="sent-lneg-td">❌ 24%</span></div>
+          </div>
+          <div id="sent-row-fn">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="font-weight:600;color:var(--fine)">FINE</span><span id="sent-val-fn" class="nw">71%</span>
+            </div>
+            <div class="sbar"><div class="sp" id="sent-pos-fn" style="width:71%"></div><div class="sn" style="width:29%"></div></div>
+            <div class="slbls"><span id="sent-lpos-fn">✅ 71%</span><span id="sent-lneg-fn">❌ 29%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="ct">Share of Voice</div>
+        <div class="cs" id="sov-subtitle">Brand awareness · All platforms</div>
+        <div class="dw">
+          <svg width="86" height="86" viewBox="0 0 100 100" style="flex-shrink:0">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#1a1e28" stroke-width="16"/>
+            <circle id="sov-arc-alo"   cx="50" cy="50" r="38" fill="none" stroke="var(--alo)"    stroke-width="16" stroke-dasharray="81 238" stroke-dashoffset="0"    transform="rotate(-90 50 50)"/>
+            <circle id="sov-arc-td"    cx="50" cy="50" r="38" fill="none" stroke="var(--todays)" stroke-width="16" stroke-dasharray="62 238" stroke-dashoffset="-81"   transform="rotate(-90 50 50)"/>
+            <circle id="sov-arc-fn"    cx="50" cy="50" r="38" fill="none" stroke="var(--fine)"   stroke-width="16" stroke-dasharray="47 238" stroke-dashoffset="-143"  transform="rotate(-90 50 50)"/>
+            <circle id="sov-arc-other" cx="50" cy="50" r="38" fill="none" stroke="#2d3345"       stroke-width="16" stroke-dasharray="48 238" stroke-dashoffset="-190"  transform="rotate(-90 50 50)"/>
+            <text x="50" y="46" text-anchor="middle" fill="var(--text)" font-size="10" font-weight="600" font-family="DM Sans,sans-serif">SOV</text>
+            <text x="50" y="57" text-anchor="middle" fill="#6b7280" font-size="8" font-family="DM Sans,sans-serif">brands</text>
+          </svg>
+          <div class="dl">
+            <div class="lr"><span class="ldot" style="background:var(--alo)"></span><span id="sov-leg-alo">ALO</span><span class="lv" id="sov-val-alo">34%</span></div>
+            <div class="lr"><span class="ldot" style="background:var(--todays)"></span>Today's<span class="lv" id="sov-val-td">26%</span></div>
+            <div class="lr"><span class="ldot" style="background:var(--fine)"></span>FINE<span class="lv" id="sov-val-fn">20%</span></div>
+            <div class="lr"><span class="ldot" style="background:#2d3345"></span>Others<span class="lv" id="sov-val-other">20%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sl">Followers <em>· Total across platforms</em></div>
+    <div class="kg">
+      <div class="kc foll-card" data-brand="ALO">
+        <div class="ktop"><span class="btag ta">ALO</span></div>
+        <div class="ktit">Total Followers</div>
+        <div class="kval" id="fv-alo">48.2K</div>
+        <div class="kdelta"><span class="up" id="fd-alo">↑ +2,340 this period</span></div>
+      </div>
+      <div class="kc foll-card" data-brand="TODAYS">
+        <div class="ktop"><span class="btag tt2">TODAY'S</span></div>
+        <div class="ktit">Total Followers</div>
+        <div class="kval" id="fv-td">31.7K</div>
+        <div class="kdelta"><span class="up" id="fd-td">↑ +1,120 this period</span></div>
+      </div>
+      <div class="kc foll-card" data-brand="FINE">
+        <div class="ktop"><span class="btag tf">FINE</span></div>
+        <div class="ktit">Total Followers</div>
+        <div class="kval" id="fv-fn">22.4K</div>
+        <div class="kdelta"><span class="up" id="fd-fn">↑ +680 this period</span></div>
+      </div>
+      <div class="kc" style="border-color:rgba(255,255,255,.1)">
+        <div class="ktop"><span class="btag tall">ALL</span></div>
+        <div class="ktit">3 Brands Total</div>
+        <div class="kval" style="color:var(--todays)" id="fv-all">102.3K</div>
+        <div class="kdelta"><span class="up" id="fd-all">↑ +4,140 this period</span></div>
+      </div>
+    </div>
+
+    <div class="sl" style="margin-top:4px">Content Quality <em>· ERR & Retention</em></div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:9px;margin-bottom:12px">
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div class="cc">
+          <div class="ct">Engagement Rate</div>
+          <div class="cs">Weekly trend – all brands</div>
+          <svg viewBox="0 0 240 108" style="width:100%;margin-top:4px">
+            <line x1="10" y1="90" x2="232" y2="90" stroke="#1e2230" stroke-width="1"/>
+            <line x1="10" y1="32" x2="232" y2="32" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+            <line x1="10" y1="58" x2="232" y2="58" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+            <polyline id="err-line-alo" points="20,50 65,42 110,35 155,28 200,22" fill="none" stroke="var(--alo)"    stroke-width="2" stroke-linejoin="round"/>
+            <polyline id="err-line-td"  points="20,62 65,59 110,56 155,53 200,49" fill="none" stroke="var(--todays)" stroke-width="2" stroke-linejoin="round"/>
+            <polyline id="err-line-fn"  points="20,72 65,70 110,69 155,72 200,67" fill="none" stroke="var(--fine)"   stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="200" cy="22" r="4" fill="var(--alo)"    stroke="var(--bg)" stroke-width="2"/>
+            <circle cx="200" cy="49" r="4" fill="var(--todays)" stroke="var(--bg)" stroke-width="2"/>
+            <circle cx="200" cy="67" r="4" fill="var(--fine)"   stroke="var(--bg)" stroke-width="2"/>
+            <text x="206" y="25"  fill="var(--alo)"    font-size="8" font-weight="600" font-family="DM Sans,sans-serif" id="err-alo">7.8%</text>
+            <text x="206" y="52"  fill="var(--todays)" font-size="8" font-weight="600" font-family="DM Sans,sans-serif" id="err-td">5.2%</text>
+            <text x="206" y="70"  fill="var(--fine)"   font-size="8" font-weight="600" font-family="DM Sans,sans-serif" id="err-fn">3.9%</text>
+            <text x="20"  y="100" fill="#6b7280" font-size="8" text-anchor="middle" font-family="DM Sans,sans-serif">Jan</text>
+            <text x="65"  y="100" fill="#6b7280" font-size="8" text-anchor="middle" font-family="DM Sans,sans-serif">Feb</text>
+            <text x="110" y="100" fill="#6b7280" font-size="8" text-anchor="middle" font-family="DM Sans,sans-serif">Mar</text>
+            <text x="155" y="100" fill="#6b7280" font-size="8" text-anchor="middle" font-family="DM Sans,sans-serif">Apr</text>
+            <text x="200" y="100" fill="#6b7280" font-size="8" text-anchor="middle" font-family="DM Sans,sans-serif">May</text>
+          </svg>
+        </div>
+        <div class="cc">
+          <div class="ct">Video View Rate</div>
+          <div class="cs">Retention – TikTok / Reels</div>
+          <div class="vg">
+            <div class="vi" id="vvr-card-alo"><div class="vb" style="color:var(--alo)">ALO</div><div class="vv" style="color:var(--alo)" id="vvr-alo">68%</div><div class="vl">retention</div></div>
+            <div class="vi" id="vvr-card-td"><div class="vb" style="color:var(--todays)">TODAY'S</div><div class="vv" style="color:var(--todays)" id="vvr-td">54%</div><div class="vl">retention</div></div>
+            <div class="vi" id="vvr-card-fn"><div class="vb" style="color:var(--fine)">FINE</div><div class="vv" style="color:var(--fine)" id="vvr-fn">47%</div><div class="vl">retention</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="ct">Top Performing Posts</div>
+        <div class="cs">Best content this period</div>
+        <div class="tw">
+          <table class="dt" id="postsTable">
+            <thead><tr><th>Brand</th><th>Post</th><th>Platform</th><th>Format</th><th class="ra">ERR</th><th class="ra">Reach</th></tr></thead>
+            <tbody>
+              <tr data-brand="ALO" data-plat="TT"><td><span class="pill pa">ALO</span></td><td>Cat eating ALO – before/after 30 days</td><td><span class="ptag pTT">TikTok</span></td><td>Video</td><td class="ng ra">12.4%</td><td class="nm ra">184K</td></tr>
+              <tr data-brand="ALO" data-plat="FB"><td><span class="pill pa">ALO</span></td><td>"7-day challenge" UGC campaign</td><td><span class="ptag pFB">Facebook</span></td><td>Carousel</td><td class="ng ra">9.8%</td><td class="nm ra">142K</td></tr>
+              <tr data-brand="ALO" data-plat="IG"><td><span class="pill pa">ALO</span></td><td>Unboxing ALO grain-free series</td><td><span class="ptag pIG">Instagram</span></td><td>Reels</td><td class="ng ra">8.5%</td><td class="nm ra">95K</td></tr>
+              <tr data-brand="TODAYS" data-plat="IG"><td><span class="pill pt">TODAY'S</span></td><td>Recipe: mix wet + dry food</td><td><span class="ptag pIG">Instagram</span></td><td>Reels</td><td class="ng ra">8.1%</td><td class="nm ra">97K</td></tr>
+              <tr data-brand="TODAYS" data-plat="ZL"><td><span class="pill pt">TODAY'S</span></td><td>Nutritional ingredient comparison</td><td><span class="ptag pZL">Zalo</span></td><td>Infographic</td><td class="nm ra">6.5%</td><td class="nm ra">73K</td></tr>
+              <tr data-brand="FINE" data-plat="TT"><td><span class="pill pf">FINE</span></td><td>Unboxing FINE premium pack</td><td><span class="ptag pTT">TikTok</span></td><td>Video</td><td class="nm ra">7.2%</td><td class="nm ra">88K</td></tr>
+              <tr data-brand="FINE" data-plat="FB"><td><span class="pill pf">FINE</span></td><td>Vet review: premium ingredients</td><td><span class="ptag pFB">Facebook</span></td><td>Post</td><td class="nm ra">5.9%</td><td class="nm ra">61K</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: PLATFORM -->
+  <div class="page" id="page-platform">
+    <div class="sl">Platform Performance <em>· Breakdown by Channel</em></div>
+    <div class="pk">
+      <div class="pc" style="border-top:2px solid var(--fb)">
+        <div class="pch"><div class="pico" style="background:rgba(24,119,242,.15)">📘</div><div><div class="pnm" style="color:var(--fb)">Facebook</div><div class="psub">Page + Groups</div></div></div>
+        <div class="preachlbl">Total Reach</div><div class="preach" style="color:var(--fb)">1.18M</div>
+        <div class="pmg">
+          <div class="pm"><div class="pml">Followers</div><div class="pmv">62.4K</div></div>
+          <div class="pm"><div class="pml">ERR avg</div><div class="pmv" style="color:var(--positive)">5.8%</div></div>
+          <div class="pm"><div class="pml">Clicks</div><div class="pmv">3,210</div></div>
+          <div class="pm"><div class="pml">CPR</div><div class="pmv">3,900₫</div></div>
+        </div>
+      </div>
+      <div class="pc" style="border-top:2px solid var(--tt)">
+        <div class="pch"><div class="pico" style="background:rgba(255,0,80,.15)">🎵</div><div><div class="pnm" style="color:var(--tt)">TikTok</div><div class="psub">Organic + Ads</div></div></div>
+        <div class="preachlbl">Total Views</div><div class="preach" style="color:var(--tt)">806K</div>
+        <div class="pmg">
+          <div class="pm"><div class="pml">Followers</div><div class="pmv">24.1K</div></div>
+          <div class="pm"><div class="pml">VVR avg</div><div class="pmv" style="color:var(--positive)">62%</div></div>
+          <div class="pm"><div class="pml">Shares</div><div class="pmv">4,820</div></div>
+          <div class="pm"><div class="pml">ERR avg</div><div class="pmv" style="color:var(--positive)">9.4%</div></div>
+        </div>
+      </div>
+      <div class="pc" style="border-top:2px solid var(--ig)">
+        <div class="pch"><div class="pico" style="background:rgba(225,48,108,.15)">📸</div><div><div class="pnm" style="color:var(--ig)">Instagram</div><div class="psub">Feed + Reels + Stories</div></div></div>
+        <div class="preachlbl">Total Reach</div><div class="preach" style="color:var(--ig)">492K</div>
+        <div class="pmg">
+          <div class="pm"><div class="pml">Followers</div><div class="pmv">11.8K</div></div>
+          <div class="pm"><div class="pml">ERR avg</div><div class="pmv" style="color:var(--positive)">6.7%</div></div>
+          <div class="pm"><div class="pml">Reels Views</div><div class="pmv">390K</div></div>
+          <div class="pm"><div class="pml">Saves</div><div class="pmv">1,240</div></div>
+        </div>
+      </div>
+      <div class="pc" style="border-top:2px solid var(--th)">
+        <div class="pch"><div class="pico" style="background:rgba(136,135,128,.15)">🧵</div><div><div class="pnm" style="color:#aaa">Threads</div><div class="psub">Text + Reposts</div></div></div>
+        <div class="preachlbl">Total Views</div><div class="preach" style="color:#aaa">147K</div>
+        <div class="pmg">
+          <div class="pm"><div class="pml">Followers</div><div class="pmv">4,200</div></div>
+          <div class="pm"><div class="pml">Replies</div><div class="pmv" style="color:var(--positive)">1,830</div></div>
+          <div class="pm"><div class="pml">Reposts</div><div class="pmv">960</div></div>
+          <div class="pm"><div class="pml">ERR avg</div><div class="pmv">4.8%</div></div>
+        </div>
+      </div>
+      <div class="pc" style="border-top:2px solid var(--zl)">
+        <div class="pch"><div class="pico" style="background:rgba(0,104,255,.15)">💬</div><div><div class="pnm" style="color:var(--zl)">Zalo OA</div><div class="psub">Official Account</div></div></div>
+        <div class="preachlbl">Total Reach</div><div class="preach" style="color:var(--zl)">168K</div>
+        <div class="pmg">
+          <div class="pm"><div class="pml">Followers</div><div class="pmv">15.6K</div></div>
+          <div class="pm"><div class="pml">Open Rate</div><div class="pmv" style="color:var(--positive)">38%</div></div>
+          <div class="pm"><div class="pml">Leads</div><div class="pmv">820</div></div>
+          <div class="pm"><div class="pml">Conv. Rate</div><div class="pmv">3.1%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cc">
+      <div class="ct">Performance Detail – Platform × Brand</div>
+      <div class="cs">All metrics · use Brand/Platform filters above</div>
+      <div class="tw">
+        <table class="dt" id="platTable">
+          <thead><tr><th>Platform</th><th>Brand</th><th class="ra">Reach/Views</th><th class="ra">Followers</th><th class="ra">ERR/VVR</th><th class="ra">Sentiment</th></tr></thead>
+          <tbody>
+            <tr data-brand="ALO"    data-plat="FB"><td><span class="ptag pFB">Facebook</span></td><td><span class="pill pa">ALO</span></td><td class="nm ra">520K</td><td class="nm ra">28,400</td><td class="ng ra">6.2%</td><td class="ng ra">84% ✅</td></tr>
+            <tr data-brand="TODAYS" data-plat="FB"><td><span class="ptag pFB">Facebook</span></td><td><span class="pill pt">TODAY'S</span></td><td class="nm ra">398K</td><td class="nm ra">22,100</td><td class="nm ra">5.4%</td><td class="nm ra">78% ✅</td></tr>
+            <tr data-brand="FINE"   data-plat="FB"><td><span class="ptag pFB">Facebook</span></td><td><span class="pill pf">FINE</span></td><td class="nm ra">262K</td><td class="nm ra">11,900</td><td class="nw ra">5.8%</td><td class="nw ra">72% ⚠️</td></tr>
+            <tr data-brand="ALO"    data-plat="TT"><td><span class="ptag pTT">TikTok</span></td><td><span class="pill pa">ALO</span></td><td class="nm ra">412K</td><td class="nm ra">12,300</td><td class="ng ra">12.4% 🔥</td><td class="ng ra">88% ✅</td></tr>
+            <tr data-brand="TODAYS" data-plat="TT"><td><span class="ptag pTT">TikTok</span></td><td><span class="pill pt">TODAY'S</span></td><td class="nm ra">248K</td><td class="nm ra">7,800</td><td class="ng ra">8.9%</td><td class="nm ra">75% ✅</td></tr>
+            <tr data-brand="FINE"   data-plat="TT"><td><span class="ptag pTT">TikTok</span></td><td><span class="pill pf">FINE</span></td><td class="nm ra">146K</td><td class="nm ra">4,000</td><td class="nm ra">7.2%</td><td class="nw ra">69% ⚠️</td></tr>
+            <tr data-brand="ALO"    data-plat="IG"><td><span class="ptag pIG">Instagram</span></td><td><span class="pill pa">ALO</span></td><td class="nm ra">220K</td><td class="nm ra">5,900</td><td class="ng ra">8.5%</td><td class="ng ra">82% ✅</td></tr>
+            <tr data-brand="TODAYS" data-plat="IG"><td><span class="ptag pIG">Instagram</span></td><td><span class="pill pt">TODAY'S</span></td><td class="nm ra">158K</td><td class="nm ra">3,800</td><td class="nm ra">6.7%</td><td class="nm ra">76% ✅</td></tr>
+            <tr data-brand="FINE"   data-plat="IG"><td><span class="ptag pIG">Instagram</span></td><td><span class="pill pf">FINE</span></td><td class="nm ra">114K</td><td class="nm ra">2,100</td><td class="nm ra">5.3%</td><td class="nw ra">71% ⚠️</td></tr>
+            <tr data-brand="TODAYS" data-plat="TH"><td><span class="ptag pTH">Threads</span></td><td><span class="pill pt">TODAY'S</span></td><td class="nm ra">89K</td><td class="nm ra">2,600</td><td class="nm ra">5.4%</td><td class="nm ra">80% ✅</td></tr>
+            <tr data-brand="ALO"    data-plat="TH"><td><span class="ptag pTH">Threads</span></td><td><span class="pill pa">ALO</span></td><td class="nm ra">58K</td><td class="nm ra">1,600</td><td class="nm ra">4.8%</td><td class="nm ra">78% ✅</td></tr>
+            <tr data-brand="ALO"    data-plat="ZL"><td><span class="ptag pZL">Zalo OA</span></td><td><span class="pill pa">ALO</span></td><td class="nm ra">82K</td><td class="nm ra">8,400</td><td class="nm ra">38% open</td><td class="ng ra">86% ✅</td></tr>
+            <tr data-brand="TODAYS" data-plat="ZL"><td><span class="ptag pZL">Zalo OA</span></td><td><span class="pill pt">TODAY'S</span></td><td class="nm ra">56K</td><td class="nm ra">5,200</td><td class="nm ra">34% open</td><td class="nm ra">77% ✅</td></tr>
+            <tr data-brand="FINE"   data-plat="ZL"><td><span class="ptag pZL">Zalo OA</span></td><td><span class="pill pf">FINE</span></td><td class="nm ra">30K</td><td class="nm ra">2,000</td><td class="nw ra">28% open</td><td class="nw ra">68% ⚠️</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: POSTS -->
+  <div class="page" id="page-posts">
+    <div class="sl">Quản lý bài đăng <em>· Content tracker</em></div>
+    <div class="post-kpi" id="post-kpi-row"></div>
+    <div class="mini-bar-wrap">
+      <div class="mini-bar-card"><div class="ct" style="margin-bottom:9px">Bài đăng theo kênh</div><div id="channel-bars"></div></div>
+      <div class="mini-bar-card"><div class="ct" style="margin-bottom:9px">Bài đăng theo brand</div><div id="brand-bars"></div></div>
+    </div>
+    <div class="pm-header">
+      <input class="pm-search" id="pm-search" placeholder="Tìm tiêu đề, phụ trách..." oninput="renderPostTable()">
+      <select class="pm-filter" id="pm-filter-status" onchange="renderPostTable()">
+        <option value="">Tất cả trạng thái</option>
+        <option>Đã đăng</option><option>Chờ duyệt</option><option>Đang làm</option><option>Chưa bắt đầu</option>
+      </select>
+      <select class="pm-filter" id="pm-filter-channel" onchange="renderPostTable()">
+        <option value="">Tất cả kênh</option>
+        <option>TikTok</option><option>Facebook</option><option>Instagram</option><option>Threads</option><option>Zalo</option>
+      </select>
+      <select class="pm-filter" id="pm-filter-brand" onchange="renderPostTable()">
+        <option value="">Tất cả brand</option>
+        <option>ALO</option><option>Today's</option><option>FINE</option>
+      </select>
+      <span class="pm-count" id="pm-count">— bài</span>
+    </div>
+    <div class="cc">
+      <div class="tw">
+        <table class="dt">
+          <thead><tr><th>#</th><th>Tiêu đề</th><th>Brand</th><th>Kênh</th><th>Deadline</th><th>Trạng thái</th><th>Phụ trách</th><th>Link</th><th></th></tr></thead>
+          <tbody id="post-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: CREATE -->
+  <div class="page" id="page-create">
+    <div class="sl">Thêm bài đăng mới <em>· Content scheduler</em></div>
+    <div class="add-form">
+      <div class="form-title">Thông tin bài đăng</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Tiêu đề *</label>
+          <input class="form-input" id="f-title" placeholder="Nhập tiêu đề bài đăng...">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Brand *</label>
+          <select class="form-input" id="f-brand">
+            <option value="">Chọn brand</option>
+            <option>ALO</option><option>Today's</option><option>FINE</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Kênh *</label>
+          <select class="form-input" id="f-channel">
+            <option value="">Chọn kênh</option>
+            <option>TikTok</option><option>Facebook</option><option>Instagram</option><option>Threads</option><option>Zalo</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Deadline *</label>
+          <input type="date" class="form-input" id="f-deadline">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Phụ trách</label>
+          <select class="form-input" id="f-assignee">
+            <option>Ngân Hà</option><option>Minh Tuấn</option><option>Thu Hương</option><option>Bảo Long</option><option>Hải Anh</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:7px;margin-top:7px">
+        <div class="form-field">
+          <label class="form-label">Link bài đăng</label>
+          <input class="form-input" id="f-link" placeholder="https://...">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Trạng thái</label>
+          <select class="form-input" id="f-status">
+            <option>Chưa bắt đầu</option><option>Đang làm</option><option>Chờ duyệt</option><option>Đã đăng</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">&nbsp;</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn-reset" onclick="resetForm()">Đặt lại</button>
+            <button class="btn-add" onclick="submitPost()">+ Thêm bài</button>
+            <span class="toast" id="toast-legacy" style="display:none">✓ Đã thêm!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sl">Bài đăng gần nhất <em>· 5 bài mới nhất</em></div>
+    <div class="cc">
+      <div class="tw">
+        <table class="dt">
+          <thead><tr><th>#</th><th>Tiêu đề</th><th>Brand</th><th>Kênh</th><th>Deadline</th><th>Trạng thái</th><th>Phụ trách</th></tr></thead>
+          <tbody id="recent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: IMPORT -->
+  <div class="page" id="page-import">
+    <div class="sl">Import Metrics <em>· Upload Facebook / Instagram Insights CSV hoặc Excel</em></div>
+
+    <!-- Success banner -->
+    <div class="import-success-banner" id="import-success-banner">
+      <span style="font-size:20px">✅</span>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--positive)" id="import-success-msg">Import thành công!</div>
+        <div style="font-size:10px;color:var(--muted)" id="import-success-sub">Dashboard đã được cập nhật.</div>
+      </div>
+    </div>
+
+    <!-- Config row -->
+    <div class="cc" style="margin-bottom:12px">
+      <div class="ct" style="margin-bottom:10px">Cấu hình Import</div>
+      <div class="import-config">
+        <div class="form-field">
+          <label class="form-label">Brand *</label>
+          <select class="form-input" id="imp-brand">
+            <option value="">-- Chọn brand --</option>
+            <option value="ALO">ALO</option>
+            <option value="TODAYS">Today's</option>
+            <option value="FINE">FINE</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Platform *</label>
+          <select class="form-input" id="imp-platform">
+            <option value="">-- Chọn platform --</option>
+            <option value="FB">Facebook</option>
+            <option value="IG">Instagram</option>
+            <option value="TT">TikTok</option>
+            <option value="TH">Threads</option>
+            <option value="ZL">Zalo</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Tháng / Kỳ</label>
+          <input type="month" class="form-input" id="imp-month" value="2026-03">
+        </div>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="import-drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFileSelect(this.files[0])">
+      <div class="dz-icon">📂</div>
+      <div class="dz-title">Kéo thả file vào đây hoặc nhấn để chọn file</div>
+      <div class="dz-sub">Hỗ trợ file xuất từ Facebook Insights, Instagram Insights, Meta Business Suite</div>
+      <div class="dz-formats">
+        <span class="dz-fmt">CSV</span>
+        <span class="dz-fmt">XLSX</span>
+        <span class="dz-fmt">XLS</span>
+      </div>
+    </div>
+
+    <!-- File info chip (shown after file selected) -->
+    <div class="file-info-chip" id="file-info-chip">
+      <div class="fi-icon">📄</div>
+      <div>
+        <div class="fi-name" id="fi-name">filename.csv</div>
+        <div class="fi-meta" id="fi-meta">0 rows · 0 KB</div>
+      </div>
+      <button class="fi-clear" onclick="clearFile()" title="Xoá file">✕</button>
+    </div>
+
+    <!-- Preview + column mapping (shown after parse) -->
+    <div class="import-preview" id="import-preview" style="display:none">
+      <div class="import-preview-header">
+        <span class="import-preview-title">Kết quả phân tích file</span>
+        <span class="import-badge" id="preview-badge">Đang phân tích...</span>
+      </div>
+      <div class="col-map-grid" id="col-map-grid"></div>
+      <div class="import-log" id="import-log"></div>
+      <div style="padding:12px 15px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <button class="btn-import" id="btn-do-import" onclick="doImport()" disabled>
+          <span>📥</span><span>Xác nhận Import vào Dashboard</span>
+        </button>
+        <span style="font-size:11px;color:var(--muted)" id="import-ready-hint">Vui lòng kiểm tra mapping trước khi import</span>
+      </div>
+    </div>
+
+    <!-- Import history -->
+    <div style="margin-top:18px">
+      <div class="sl">Lịch sử Import <em>· Các lần import gần nhất</em></div>
+      <div class="cc">
+        <div class="tw">
+          <table class="history-table">
+            <thead><tr>
+              <th>Thời gian</th><th>File</th><th>Brand</th><th>Platform</th><th>Kỳ</th>
+              <th class="ra" style="text-align:right">Reach</th>
+              <th class="ra" style="text-align:right">Followers</th>
+              <th class="ra" style="text-align:right">ERR</th>
+              <th>Trạng thái</th>
+            </tr></thead>
+            <tbody id="import-history-tbody">
+              <tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px;font-size:11px;font-style:italic">Chưa có lần import nào</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample file hint -->
+    <div style="margin-top:14px;background:rgba(62,184,240,.06);border:1px solid rgba(62,184,240,.15);border-radius:10px;padding:13px 16px">
+      <div style="font-size:11px;font-weight:600;color:var(--todays);margin-bottom:6px">💡 Hướng dẫn xuất file từ Meta</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.7">
+        <b style="color:var(--muted2)">Facebook:</b> Business Suite → Insights → Export → chọn CSV · Các cột nhận diện: <code style="font-family:'DM Mono',monospace;font-size:10px;background:var(--surface2);padding:1px 5px;border-radius:3px">Reach, Impressions, Engagement, Followers</code><br>
+        <b style="color:var(--muted2)">Instagram:</b> Professional Dashboard → Insights → Export CSV · Cột: <code style="font-family:'DM Mono',monospace;font-size:10px;background:var(--surface2);padding:1px 5px;border-radius:3px">accounts_reached, impressions, total_interactions</code><br>
+        <b style="color:var(--muted2)">TikTok:</b> Creator Center → Analytics → Export · Cột: <code style="font-family:'DM Mono',monospace;font-size:10px;background:var(--surface2);padding:1px 5px;border-radius:3px">video_views, followers, engagement_rate</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: NHẬP LIỆU HẰNG NGÀY ══ -->
+  <div class="page" id="page-entry">
+    <div class="sl">Nhập số liệu hôm nay <em>· Mỗi thành viên nhập số liệu mạng xã hội theo ngày</em></div>
+    <div class="entry-form">
+      <div class="entry-grid">
+        <div class="entry-field">
+          <label>Ngày</label>
+          <input type="date" id="e-date">
+        </div>
+        <div class="entry-field">
+          <label>Thương hiệu</label>
+          <select id="e-brand">
+            <option value="ALO">ALO</option>
+            <option value="Today's">Today's</option>
+            <option value="FINE">FINE</option>
+          </select>
+        </div>
+        <div class="entry-field">
+          <label>Nền tảng</label>
+          <select id="e-platform">
+            <option value="Facebook">Facebook</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Threads">Threads</option>
+            <option value="Zalo">Zalo</option>
+          </select>
+        </div>
+        <div class="entry-field">
+          <label>Reach (tiếp cận)</label>
+          <input type="number" id="e-reach" placeholder="VD: 12500" min="0">
+        </div>
+        <div class="entry-field">
+          <label>Followers (tổng)</label>
+          <input type="number" id="e-foll" placeholder="VD: 48200" min="0">
+        </div>
+        <div class="entry-field">
+          <label>Follower tăng (+)</label>
+          <input type="number" id="e-newfoll" placeholder="VD: 120">
+        </div>
+        <div class="entry-field">
+          <label>Tương tác (like+cmt+share)</label>
+          <input type="number" id="e-eng" placeholder="VD: 980" min="0">
+        </div>
+        <div class="entry-field">
+          <label>ERR % (tỷ lệ tương tác)</label>
+          <input type="number" id="e-err" placeholder="VD: 7.8" step="0.1" min="0">
+        </div>
+        <div class="entry-field full">
+          <label>Ghi chú (tuỳ chọn)</label>
+          <input type="text" id="e-note" placeholder="VD: chạy ads campaign Boss Đi Làm">
+        </div>
+      </div>
+      <div class="entry-actions">
+        <button class="entry-save" id="e-save" onclick="saveEntry()"><span>💾</span><span>Lưu số liệu</span></button>
+        <span class="entry-msg" id="e-msg"></span>
+      </div>
+    </div>
+
+    <div class="sl" style="margin-top:18px">Dữ liệu đã nhập gần đây <em>· Cả team cùng thấy</em></div>
+    <div class="cc">
+      <div class="tw">
+        <table class="entry-table">
+          <thead><tr>
+            <th>Ngày</th><th>Brand</th><th>Nền tảng</th>
+            <th style="text-align:right">Reach</th><th style="text-align:right">Followers</th>
+            <th style="text-align:right">+Foll</th><th style="text-align:right">ERR</th>
+            <th>Người nhập</th>
+          </tr></thead>
+          <tbody id="entry-tbody">
+            <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px;font-style:italic">Đang tải dữ liệu…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ── DATA ──
+const DB={ALL:{ALL:{reach:'2.81M',rDelta:'+10.5%',rSign:'up',foll:'102.3K',fDelta:'+4,140',err:'5.6%',errSign:'ng',vvr:'56%',sent:[82,76,71],sov:[34,26,20,20]},FB:{reach:'1.18M',rDelta:'+8%',rSign:'up',foll:'62,400',fDelta:'+2,100',err:'5.8%',errSign:'ng',vvr:'—',sent:[84,78,72],sov:[40,28,17,15]},TT:{reach:'806K',rDelta:'+20%',rSign:'up',foll:'24,100',fDelta:'+1,240',err:'9.5%',errSign:'ng',vvr:'59%',sent:[88,75,69],sov:[29,22,19,30]},IG:{reach:'492K',rDelta:'+8%',rSign:'up',foll:'11,800',fDelta:'+450',err:'6.8%',errSign:'ng',vvr:'51%',sent:[82,76,71],sov:[31,24,22,23]},TH:{reach:'147K',rDelta:'+10%',rSign:'up',foll:'4,200',fDelta:'+150',err:'5.1%',errSign:'nm',vvr:'44%',sent:[79,80,0],sov:[18,35,12,35]},ZL:{reach:'168K',rDelta:'+7%',rSign:'up',foll:'15,600',fDelta:'+310',err:'33% open',errSign:'ng',vvr:'—',sent:[86,77,68],sov:[38,30,14,18]}},ALO:{ALL:{reach:'1.24M',rDelta:'+18%',rSign:'up',foll:'48.2K',fDelta:'+2,340',err:'7.8%',errSign:'ng',vvr:'68%',sent:[82],sov:[34,66]},FB:{reach:'520K',rDelta:'+14%',rSign:'up',foll:'28,400',fDelta:'+1,100',err:'6.2%',errSign:'ng',vvr:'—',sent:[84],sov:[40,60]},TT:{reach:'412K',rDelta:'+26%',rSign:'up',foll:'12,300',fDelta:'+820',err:'12.4%',errSign:'ng',vvr:'68%',sent:[88],sov:[29,71]},IG:{reach:'220K',rDelta:'+11%',rSign:'up',foll:'5,900',fDelta:'+240',err:'8.5%',errSign:'ng',vvr:'61%',sent:[82],sov:[31,69]},TH:{reach:'58K',rDelta:'+8%',rSign:'up',foll:'1,600',fDelta:'+60',err:'4.8%',errSign:'nm',vvr:'44%',sent:[78],sov:[18,82]},ZL:{reach:'82K',rDelta:'+9%',rSign:'up',foll:'8,400',fDelta:'+180',err:'38% open',errSign:'ng',vvr:'—',sent:[86],sov:[38,62]}},TODAYS:{ALL:{reach:'892K',rDelta:'+9%',rSign:'up',foll:'31.7K',fDelta:'+1,120',err:'5.2%',errSign:'ng',vvr:'54%',sent:[76],sov:[26,74]},FB:{reach:'398K',rDelta:'+7%',rSign:'up',foll:'22,100',fDelta:'+680',err:'5.4%',errSign:'nm',vvr:'—',sent:[78],sov:[28,72]},TT:{reach:'248K',rDelta:'+18%',rSign:'up',foll:'7,800',fDelta:'+310',err:'8.9%',errSign:'ng',vvr:'58%',sent:[75],sov:[22,78]},IG:{reach:'158K',rDelta:'+8%',rSign:'up',foll:'3,800',fDelta:'+130',err:'6.7%',errSign:'ng',vvr:'49%',sent:[76],sov:[24,76]},TH:{reach:'89K',rDelta:'+12%',rSign:'up',foll:'2,600',fDelta:'+90',err:'5.4%',errSign:'nm',vvr:'44%',sent:[80],sov:[35,65]},ZL:{reach:'56K',rDelta:'+6%',rSign:'up',foll:'5,200',fDelta:'+90',err:'34% open',errSign:'nm',vvr:'—',sent:[77],sov:[30,70]}},FINE:{ALL:{reach:'675K',rDelta:'-3%',rSign:'dn',foll:'22.4K',fDelta:'+680',err:'3.9%',errSign:'nm',vvr:'47%',sent:[71],sov:[20,80]},FB:{reach:'262K',rDelta:'-5%',rSign:'dn',foll:'11,900',fDelta:'+320',err:'5.8%',errSign:'nm',vvr:'—',sent:[72],sov:[17,83]},TT:{reach:'146K',rDelta:'+5%',rSign:'up',foll:'4,000',fDelta:'+110',err:'7.2%',errSign:'ng',vvr:'51%',sent:[69],sov:[19,81]},IG:{reach:'114K',rDelta:'+2%',rSign:'up',foll:'2,100',fDelta:'+80',err:'5.3%',errSign:'nm',vvr:'42%',sent:[71],sov:[22,78]},TH:{reach:'—',rDelta:'—',rSign:'nm',foll:'—',fDelta:'—',err:'—',errSign:'nm',vvr:'—',sent:[0],sov:[12,88]},ZL:{reach:'30K',rDelta:'+2%',rSign:'up',foll:'2,000',fDelta:'+40',err:'28% open',errSign:'nw',vvr:'—',sent:[68],sov:[14,86]}}};
+const PERIOD_SCALE={today:.034,week:.25,month:1,quarter:2.9,ytd:4.1};
+const PERIOD_META={today:{label:'Today',range:'27/03/2026'},week:{label:'This week',range:'21–27/03/2026'},month:{label:'This month',range:'01–27/03/2026'},quarter:{label:'This quarter',range:'01/01–31/03/2026'},ytd:{label:'YTD 2026',range:'01/01–27/03/2026'}};
+
+let curPeriod='month',curBrand='ALL',curPlat='ALL';
+
+// Dữ liệu bài đăng được nạp từ Supabase (bảng "posts"). Bắt đầu rỗng.
+let posts=[];
+
+const STATUS_CLS={'Đã đăng':'st-posted','Chờ duyệt':'st-review','Đang làm':'st-wip','Chưa bắt đầu':'st-todo'};
+const CHAN_COLOR={TikTok:'var(--tt)',Facebook:'var(--fb)',Instagram:'var(--ig)',Threads:'var(--th)',Zalo:'var(--zl)'};
+const BRAND_COLORS={'ALO':'var(--alo)',"Today's":'var(--todays)','FINE':'var(--fine)'};
+
+// ── HELPERS ──
+function $id(id){return document.getElementById(id);}
+function setTxt(id,v){const e=$id(id);if(e)e.textContent=v;}
+function setCls(id,c){const e=$id(id);if(e)e.className=c;}
+function setStl(id,p,v){const e=$id(id);if(e)e.style[p]=v;}
+function scaleStr(str,f){
+  if(!str||str==='—')return str;
+  const n=parseFloat(str.replace(/[^\d.]/g,''));if(isNaN(n))return str;
+  const s=n*f;
+  if(str.includes('M'))return s.toFixed(2).replace(/\.?0+$/,'')+'M';
+  if(str.includes('K'))return s>=1000?(s/1000).toFixed(1).replace(/\.?0+$/,'')+'M':Math.round(s)+'K';
+  if(str.includes('%')||str.includes('open'))return str;
+  return Math.round(s).toLocaleString('vi-VN');
+}
+
+// ── ANALYTICS RENDER ──
+function render(){
+  const sc=PERIOD_SCALE[curPeriod]||1;
+  const pm=PERIOD_META[curPeriod]||PERIOD_META.month;
+  setTxt('topbar-date','📅 '+pm.range);
+
+  const isSingle=curBrand!=='ALL';
+  const bKeys=['alo','td','fn'],bCodes=['ALO','TODAYS','FINE'];
+
+  // show/hide brand cards
+  bKeys.forEach((k,i)=>{
+    const c=document.querySelector(`.kc[data-brand="${bCodes[i]}"]`);
+    if(c)c.style.display=(!isSingle||curBrand===bCodes[i])?'':'none';
+    const fc=document.querySelector(`.foll-card[data-brand="${bCodes[i]}"]`);
+    if(fc)fc.style.display=(!isSingle||curBrand===bCodes[i])?'':'none';
+    const sr=$id('sent-row-'+k);if(sr)sr.style.display=(!isSingle||curBrand===bCodes[i])?'':'none';
+    const vc=$id('vvr-card-'+k);if(vc)vc.style.display=(!isSingle||curBrand===bCodes[i])?'':'none';
+    const el=$id('err-line-'+k);
+    if(el){el.style.opacity=(!isSingle||curBrand===bCodes[i])?'1':'0.1';el.style.strokeWidth=(!isSingle||curBrand===bCodes[i])?'2':'1';}
+  });
+
+  if(isSingle){
+    const k={ALO:'alo',TODAYS:'td',FINE:'fn'}[curBrand];
+    const d=DB[curBrand][curPlat]||DB[curBrand].ALL;
+    const dAll=DB[curBrand].ALL;
+    setTxt('rv-'+k,scaleStr(d.reach,sc));
+    setTxt('rd-'+k,(d.rSign==='up'?'↑ ':d.rSign==='dn'?'↓ ':'')+d.rDelta);
+    setCls('rd-'+k,d.rSign==='up'?'up':d.rSign==='dn'?'dn':'');
+    setTxt('rv-all',scaleStr(dAll.reach,sc));
+    setTxt('rd-all',(dAll.rSign==='up'?'↑ ':dAll.rSign==='dn'?'↓ ':'')+dAll.rDelta);
+    setTxt('fv-'+k,scaleStr(d.foll,sc));
+    setTxt('fv-all',scaleStr(dAll.foll,sc));
+    setTxt('err-'+k,d.err);
+    setCls('err-'+k,d.errSign);
+    setTxt('vvr-'+k,d.vvr);
+    const pct=d.sent[0]||0;
+    setStl('sent-pos-'+k,'width',pct+'%');
+    setTxt('sent-val-'+k,pct+'%');setCls('sent-val-'+k,pct>=80?'ng':pct>=70?'nw':'nr');
+    setTxt('sent-lpos-'+k,'✅ '+pct+'%');setTxt('sent-lneg-'+k,'❌ '+(100-pct)+'%');
+    renderSOV(d.sov,true,curBrand);
+  } else {
+    bKeys.forEach((k,i)=>{
+      const bd=DB[bCodes[i]][curPlat]||DB[bCodes[i]].ALL;
+      setTxt('rv-'+k,scaleStr(bd.reach,sc));
+      setTxt('rd-'+k,(bd.rSign==='up'?'↑ ':bd.rSign==='dn'?'↓ ':'')+bd.rDelta);
+      setCls('rd-'+k,bd.rSign==='up'?'up':bd.rSign==='dn'?'dn':'');
+      setTxt('fv-'+k,scaleStr(bd.foll,sc));
+      setTxt('err-'+k,bd.err);setCls('err-'+k,bd.errSign);
+      setTxt('vvr-'+k,bd.vvr);
+      const pct=bd.sent[0]||0;
+      setStl('sent-pos-'+k,'width',pct+'%');
+      setTxt('sent-val-'+k,pct+'%');setCls('sent-val-'+k,pct>=80?'ng':pct>=70?'nw':'nr');
+      setTxt('sent-lpos-'+k,'✅ '+pct+'%');setTxt('sent-lneg-'+k,'❌ '+(100-pct)+'%');
+    });
+    const dAll=DB.ALL[curPlat]||DB.ALL.ALL;
+    setTxt('rv-all',scaleStr(dAll.reach,sc));
+    setTxt('rd-all',(dAll.rSign==='up'?'↑ ':dAll.rSign==='dn'?'↓ ':'')+dAll.rDelta);
+    setTxt('fv-all',scaleStr(dAll.foll,sc));
+    renderSOV(dAll.sov,false,'ALL');
+  }
+
+  setTxt('rp-alo',curPlat==='ALL'?'All platforms':{'FB':'Facebook','TT':'TikTok','IG':'Instagram','TH':'Threads','ZL':'Zalo OA'}[curPlat]||curPlat);
+  filterTables();
+}
+
+function renderSOV(sovArr,isSingle,brand){
+  if(!sovArr)return;
+  const C=238.76;
+  if(isSingle){
+    const b=sovArr[0]||0,c=sovArr[1]||0;
+    const bColors={ALO:'var(--alo)',TODAYS:'var(--todays)',FINE:'var(--fine)'};
+    const arcA=$id('sov-arc-alo'),arcT=$id('sov-arc-td'),arcF=$id('sov-arc-fn'),arcO=$id('sov-arc-other');
+    if(arcT)arcT.setAttribute('stroke-dasharray','0 '+C);
+    if(arcF)arcF.setAttribute('stroke-dasharray','0 '+C);
+    if(arcA){arcA.setAttribute('stroke',bColors[brand]||'var(--alo)');arcA.setAttribute('stroke-dasharray',(b/100*C).toFixed(1)+' '+C);arcA.setAttribute('stroke-dashoffset','0');}
+    if(arcO){arcO.setAttribute('stroke-dasharray',(c/100*C).toFixed(1)+' '+C);arcO.setAttribute('stroke-dashoffset',(-(b/100*C)).toFixed(1));}
+    setTxt('sov-val-alo',b+'%');setTxt('sov-val-td','—');setTxt('sov-val-fn','—');setTxt('sov-val-other',c+'%');
+  } else {
+    let off=0;
+    ['alo','td','fn','other'].forEach((k,i)=>{
+      const arc=$id('sov-arc-'+k);const pct=sovArr[i]||0;const dash=pct/100*C;
+      const cols=['var(--alo)','var(--todays)','var(--fine)','#2d3345'];
+      if(arc){arc.setAttribute('stroke',cols[i]);arc.setAttribute('stroke-dasharray',dash.toFixed(1)+' '+C);arc.setAttribute('stroke-dashoffset',(-off).toFixed(1));}
+      setTxt('sov-val-'+k,pct?pct+'%':'—');off+=dash;
+    });
+  }
+}
+
+function filterTables(){
+  document.querySelectorAll('#postsTable tbody tr,#platTable tbody tr').forEach(row=>{
+    const bOK=curBrand==='ALL'||row.dataset.brand===curBrand;
+    const pOK=curPlat==='ALL'||row.dataset.plat===curPlat;
+    row.style.display=(bOK&&pOK)?'':'none';
+  });
+}
+
+// ── POST MANAGEMENT ──
+function stBadge(s){return`<span class="status-badge ${STATUS_CLS[s]||'st-todo'}">${s}</span>`;}
+function chBadge(ch){return`<span class="ch-badge ch-${ch}">${ch}</span>`;}
+function brBadge(br){const cls=br==='ALO'?'pa':br==="Today's"?'pt':'pf';return`<span class="pill ${cls}">${br==="Today's"?"TODAY'S":br}</span>`;}
+
+function renderPostTable(){
+  const search=($id('pm-search').value||'').toLowerCase();
+  const fSt=$id('pm-filter-status').value;
+  const fCh=$id('pm-filter-channel').value;
+  const fBr=$id('pm-filter-brand').value;
+  const bFilter=curBrand==='ALL'?'':(curBrand==='TODAYS'?"Today's":curBrand);
+
+  const filtered=posts.filter(p=>{
+    return(!bFilter||p.brand===bFilter)&&(!fSt||p.status===fSt)&&(!fCh||p.channel===fCh)&&(!fBr||p.brand===fBr)&&(!search||p.title.toLowerCase().includes(search)||p.assignee.toLowerCase().includes(search));
+  });
+
+  const tb=$id('post-tbody');
+  if(tb)tb.innerHTML=filtered.map(p=>`
+    <tr>
+      <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:10px">${p.id}</td>
+      <td style="max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500">${p.title}</td>
+      <td>${brBadge(p.brand)}</td>
+      <td>${chBadge(p.channel)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap">${p.deadline}</td>
+      <td>${stBadge(p.status)}</td>
+      <td style="white-space:nowrap;font-size:11px">${p.assignee}</td>
+      <td>${p.link?`<a href="${p.link}" target="_blank" style="color:var(--todays);font-size:11px">↗</a>`:'—'}</td>
+      <td><button class="btn-del" onclick="deletePost(${p.id})">✕</button></td>
+    </tr>`).join('');
+
+  setTxt('pm-count',filtered.length+' bài');
+  renderPostKPI();renderBarCharts();updateBadge();
+}
+
+function renderPostKPI(){
+  const t=posts.length,po=posts.filter(p=>p.status==='Đã đăng').length,rv=posts.filter(p=>p.status==='Chờ duyệt').length,wi=posts.filter(p=>p.status==='Đang làm').length;
+  const row=$id('post-kpi-row');
+  if(!row)return;
+  row.innerHTML=[
+    {label:'Tổng bài đăng',val:t,sub:'Tất cả kênh',color:'var(--text)'},
+    {label:'Đã đăng',val:po,sub:(t?Math.round(po/t*100):0)+'% hoàn thành',color:'var(--positive)'},
+    {label:'Chờ duyệt',val:rv,sub:'Cần review',color:'var(--warn)'},
+    {label:'Đang làm',val:wi,sub:'In progress',color:'var(--todays)'},
+  ].map(k=>`<div class="pkpi"><div class="pkpi-label">${k.label}</div><div class="pkpi-val" style="color:${k.color}">${k.val}</div><div class="pkpi-sub">${k.sub}</div></div>`).join('');
+}
+
+function renderBarCharts(){
+  const channels=['TikTok','Facebook','Instagram','Threads','Zalo'];
+  const chData=channels.map(c=>({c,n:posts.filter(p=>p.channel===c).length})).filter(x=>x.n>0);
+  const mx=Math.max(...chData.map(x=>x.n),1);
+  const cb=$id('channel-bars');
+  if(cb)cb.innerHTML=chData.map(({c,n})=>`<div class="mb-row"><span class="mb-label">${c}</span><div class="mb-bar-bg"><div class="mb-bar" style="width:${Math.round(n/mx*100)}%;background:${CHAN_COLOR[c]||'var(--muted)'}"></div></div><span class="mb-val">${n}</span></div>`).join('');
+
+  const brands=["ALO","Today's","FINE"];const bColors=['var(--alo)','var(--todays)','var(--fine)'];
+  const brData=brands.map((b,i)=>({b,i,n:posts.filter(p=>p.brand===b).length}));
+  const mx2=Math.max(...brData.map(x=>x.n),1);
+  const bb=$id('brand-bars');
+  if(bb)bb.innerHTML=brData.map(({b,i,n})=>`<div class="mb-row"><span class="mb-label">${b}</span><div class="mb-bar-bg"><div class="mb-bar" style="width:${Math.round(n/mx2*100)}%;background:${bColors[i]}"></div></div><span class="mb-val">${n}</span></div>`).join('');
+}
+
+function renderRecentPosts(){
+  const tb=$id('recent-tbody');if(!tb)return;
+  tb.innerHTML=[...posts].slice(-5).reverse().map(p=>`
+    <tr>
+      <td style="color:var(--muted);font-size:10px;font-family:'DM Mono',monospace">${p.id}</td>
+      <td style="font-weight:500;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.title}</td>
+      <td>${brBadge(p.brand)}</td>
+      <td>${chBadge(p.channel)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${p.deadline}</td>
+      <td>${stBadge(p.status)}</td>
+      <td style="font-size:11px">${p.assignee}</td>
+    </tr>`).join('');
+}
+
+async function deletePost(id){
+  if(!SB_READY){toast('⚠️ Chưa cấu hình Supabase');return;}
+  const {error}=await sbClient.from('posts').delete().eq('id',id);
+  if(error){alert('Lỗi khi xoá: '+error.message);return;}
+  toast('🗑️ Đã xoá bài');
+  loadPosts();
+}
+
+async function submitPost(){
+  const title=$id('f-title').value.trim(),brand=$id('f-brand').value,channel=$id('f-channel').value,deadline=$id('f-deadline').value;
+  if(!title||!brand||!channel||!deadline){alert('Vui lòng điền đầy đủ thông tin bắt buộc (*)');return;}
+  if(!SB_READY){toast('⚠️ Chưa cấu hình Supabase');return;}
+  const rec={
+    title, brand, channel,
+    link:$id('f-link').value||null,
+    deadline,
+    status:$id('f-status').value,
+    assignee:$id('f-assignee').value,
+    created_by:(currentUser&&currentUser.email)||null
+  };
+  const btn=document.querySelector('.btn-add'); if(btn)btn.disabled=true;
+  const {error}=await sbClient.from('posts').insert(rec);
+  if(btn)btn.disabled=false;
+  if(error){alert('Lỗi khi lưu bài: '+error.message);return;}
+  resetForm();
+  toast('✓ Đã thêm bài lên Supabase');
+  loadPosts();
+}
+
+function resetForm(){
+  ['f-title','f-link','f-deadline'].forEach(id=>{const e=$id(id);if(e)e.value='';});
+  ['f-brand','f-channel','f-status'].forEach(id=>{const e=$id(id);if(e)e.selectedIndex=0;});
+}
+
+function updateBadge(){const b=$id('post-count-badge');if(b)b.textContent=posts.length;}
+
+// ── NAVIGATION ──
+function switchPage(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  const pg=$id('page-'+page);if(pg)pg.classList.add('active');
+  el.classList.add('active');
+  const titles={analytics:'Performance Dashboard',platform:'Platform Performance',posts:'Quản lý bài đăng',create:'Thêm bài đăng mới',import:'Import Metrics',entry:'Nhập liệu hằng ngày'};
+  setTxt('topbar-title',titles[page]||'Dashboard');
+  const hasFilters=['analytics','platform'].includes(page);
+  $id('quickTabs').style.display=hasFilters?'':'none';
+  $id('platFlt').style.display=hasFilters?'':'none';
+  if(page==='posts'){renderPostTable();}
+  if(page==='create'){renderRecentPosts();}
+  if(page==='entry'){loadEntries();}
+}
+
+function setBrand(brand,el){
+  curBrand=brand;
+  document.querySelectorAll('.sb-brand-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  render();renderPostTable();
+}
+
+// ── EVENT LISTENERS ──
+document.querySelectorAll('#quickTabs .qt-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('#quickTabs .qt-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');curPeriod=this.dataset.q;render();
+  });
+});
+document.querySelectorAll('#platFlt .pf-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('#platFlt .pf-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');curPlat=this.dataset.p;render();
+  });
+});
+
+// ── IMPORT METRICS ──
+
+// Column mapping aliases: dashboard key → possible CSV column names (lowercase, trimmed)
+const COL_ALIASES = {
+  reach:      ['reach','accounts_reached','total_reach','unique_reach','weekly_reach','post_reach','page_reach','net_reach','portée'],
+  impressions:['impressions','total_impressions','post_impressions','page_impressions','views'],
+  followers:  ['followers','follower_count','total_followers','accounts_following','follows','page_likes','page_followers','new_followers','net_followers'],
+  engagement: ['engagement','engagements','total_interactions','total_engagements','interactions','likes_and_comments','reactions_comments_shares'],
+  err:        ['engagement_rate','engagement rate','err','rate_of_engagement','interaction_rate','errate','taux_d_engagement'],
+  vvr:        ['video_views','video_view_rate','video_retention','view_rate','video_plays','watch_rate','3s_video_views','thruplays'],
+  clicks:     ['clicks','link_clicks','post_clicks','cta_clicks','outbound_clicks'],
+  sentiment_pos: ['positive_sentiment','positive','sentiment_positive','pos_sentiment'],
+  date:       ['date','period','week','month','day','timestamp','report_date'],
+};
+
+const REQUIRED_COLS = ['reach','followers','engagement'];
+const OPTIONAL_COLS = ['impressions','err','vvr','clicks','sentiment_pos'];
+
+let parsedFileData = null;   // raw parsed rows
+let mappedColumns  = {};     // { dashKey: foundColName }
+let importHistory  = [];
+let currentFile    = null;
+
+// ─── Drag & Drop ───
+const dropZone = document.getElementById('drop-zone');
+['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); }));
+dropZone.addEventListener('drop', ev => {
+  const file = ev.dataTransfer.files[0];
+  if(file) handleFileSelect(file);
+});
+
+function handleFileSelect(file) {
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(!['csv','xlsx','xls'].includes(ext)) {
+    showImportError('❌ Định dạng không hỗ trợ. Vui lòng chọn file CSV, XLSX hoặc XLS.');
+    return;
+  }
+  currentFile = file;
+  showFileChip(file);
+  if(ext === 'csv') parseCSV(file);
+  else parseExcel(file);
+}
+
+function showFileChip(file) {
+  const chip = document.getElementById('file-info-chip');
+  document.getElementById('fi-name').textContent = file.name;
+  document.getElementById('fi-meta').textContent = `${(file.size/1024).toFixed(1)} KB`;
+  chip.classList.add('show');
+}
+
+function clearFile() {
+  currentFile = null; parsedFileData = null; mappedColumns = {};
+  document.getElementById('file-input').value = '';
+  document.getElementById('file-info-chip').classList.remove('show');
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-success-banner').classList.remove('show');
+}
+
+function parseCSV(file) {
+  Papa.parse(file, {
+    header: true, skipEmptyLines: true, dynamicTyping: true,
+    complete: res => processRows(res.data, res.meta.fields || [], file.name),
+    error: err => showImportError('❌ Lỗi đọc CSV: ' + err.message)
+  });
+}
+
+function parseExcel(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      const cols = rows.length ? Object.keys(rows[0]) : [];
+      processRows(rows, cols, file.name);
+    } catch(err) {
+      showImportError('❌ Lỗi đọc Excel: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function normalizeKey(s) {
+  return String(s).toLowerCase().trim().replace(/[\s\-\/\.]+/g,'_').replace(/[^a-z0-9_]/g,'');
+}
+
+function processRows(rows, cols, fileName) {
+  if(!rows || rows.length === 0) { showImportError('❌ File không có dữ liệu.'); return; }
+  parsedFileData = rows;
+
+  // Update file meta with row count
+  document.getElementById('fi-meta').textContent =
+    `${rows.length} dòng dữ liệu · ${(currentFile.size/1024).toFixed(1)} KB`;
+
+  // Build column map
+  mappedColumns = {};
+  const normalizedCols = cols.map(c => ({orig:c, norm:normalizeKey(c)}));
+
+  Object.entries(COL_ALIASES).forEach(([key, aliases]) => {
+    for(const alias of aliases) {
+      const normAlias = normalizeKey(alias);
+      const found = normalizedCols.find(c => c.norm === normAlias || c.norm.includes(normAlias) || normAlias.includes(c.norm));
+      if(found) { mappedColumns[key] = found.orig; break; }
+    }
+  });
+
+  renderColumnMap(cols);
+  renderImportLog(rows, cols);
+}
+
+function renderColumnMap(cols) {
+  const preview = document.getElementById('import-preview');
+  const grid = document.getElementById('col-map-grid');
+  preview.style.display = 'block';
+
+  const allKeys = [...REQUIRED_COLS, ...OPTIONAL_COLS];
+  const labels  = {
+    reach:'Reach / Tiếp cận', impressions:'Impressions', followers:'Followers',
+    engagement:'Engagement', err:'Engagement Rate', vvr:'Video View Rate',
+    clicks:'Link Clicks', sentiment_pos:'Positive Sentiment', date:'Date / Period'
+  };
+
+  grid.innerHTML = [...allKeys,'date'].map(key => {
+    const found = mappedColumns[key];
+    const isRequired = REQUIRED_COLS.includes(key);
+    const cls = found ? 'matched' : (isRequired ? 'missing' : '');
+    const valCls = found ? 'ok' : (isRequired ? 'miss' : 'warn');
+    const valTxt = found ? `✓ "${found}"` : (isRequired ? '✕ Không tìm thấy' : '— Không có');
+    return `<div class="col-map-item ${cls}">
+      <div class="col-map-label">${labels[key]||key}${isRequired?' <span style="color:var(--negative)">*</span>':''}</div>
+      <div class="col-map-val ${valCls}">${valTxt}</div>
+    </div>`;
+  }).join('');
+
+  // Badge
+  const missingRequired = REQUIRED_COLS.filter(k => !mappedColumns[k]);
+  const badge = document.getElementById('preview-badge');
+  const hint  = document.getElementById('import-ready-hint');
+  const btn   = document.getElementById('btn-do-import');
+
+  if(missingRequired.length === 0) {
+    badge.className = 'import-badge';
+    badge.textContent = `✓ ${Object.keys(mappedColumns).length} cột khớp — Sẵn sàng import`;
+    btn.disabled = false;
+    hint.textContent = `Tìm thấy ${parsedFileData.length} dòng dữ liệu`;
+    hint.style.color = 'var(--positive)';
+  } else {
+    badge.className = 'import-badge err';
+    badge.textContent = `⚠ Thiếu cột bắt buộc: ${missingRequired.join(', ')}`;
+    btn.disabled = true;
+    hint.textContent = 'Không thể import — thiếu cột quan trọng';
+    hint.style.color = 'var(--negative)';
+  }
+}
+
+function renderImportLog(rows, cols) {
+  const log = document.getElementById('import-log');
+  const logs = [];
+
+  logs.push({type:'ok', msg:`Đọc file thành công: ${rows.length} dòng, ${cols.length} cột`});
+
+  const found = Object.entries(mappedColumns);
+  const missing = [...REQUIRED_COLS, ...OPTIONAL_COLS].filter(k => !mappedColumns[k]);
+
+  found.forEach(([k,v]) => logs.push({type:'ok', msg:`Khớp cột "${v}" → ${k}`}));
+  missing.filter(k => REQUIRED_COLS.includes(k)).forEach(k =>
+    logs.push({type:'err', msg:`Thiếu cột bắt buộc: ${k} — không tìm thấy tên phù hợp`})
+  );
+  missing.filter(k => OPTIONAL_COLS.includes(k)).forEach(k =>
+    logs.push({type:'warn', msg:`Không tìm thấy cột tùy chọn: ${k} (sẽ bỏ qua)`})
+  );
+
+  // Check numeric validity of key cols
+  if(mappedColumns.reach) {
+    const vals = rows.map(r => parseFloat(String(r[mappedColumns.reach]).replace(/[,\s]/g,''))).filter(v => !isNaN(v));
+    if(vals.length > 0) logs.push({type:'ok', msg:`Reach: ${vals.length} giá trị hợp lệ, max = ${fmt(Math.max(...vals))}`});
+    else logs.push({type:'err', msg:`Cột Reach không có giá trị số hợp lệ`});
+  }
+
+  log.innerHTML = logs.map(l =>
+    `<div class="log-entry ${l.type}"><div class="log-dot"></div><span>${l.msg}</span></div>`
+  ).join('');
+}
+
+function aggregateValue(rows, colName, agg='sum') {
+  if(!colName) return null;
+  const vals = rows
+    .map(r => parseFloat(String(r[colName]).replace(/[,%\s]/g,'')))
+    .filter(v => !isNaN(v) && isFinite(v));
+  if(!vals.length) return null;
+  if(agg === 'avg') return vals.reduce((a,b)=>a+b,0)/vals.length;
+  return vals.reduce((a,b)=>a+b,0);
+}
+
+function fmt(n) {
+  if(n === null || n === undefined) return '—';
+  if(n >= 1e6) return (n/1e6).toFixed(2).replace(/\.?0+$/,'')+'M';
+  if(n >= 1e3) return (n/1e3).toFixed(1).replace(/\.?0+$/,'')+'K';
+  return Math.round(n).toLocaleString('vi-VN');
+}
+
+function doImport() {
+  const brand    = document.getElementById('imp-brand').value;
+  const platform = document.getElementById('imp-platform').value;
+  const month    = document.getElementById('imp-month').value;
+
+  if(!brand)    { alert('Vui lòng chọn Brand trước khi import!'); return; }
+  if(!platform) { alert('Vui lòng chọn Platform trước khi import!'); return; }
+  if(!parsedFileData || parsedFileData.length === 0) { alert('Không có dữ liệu để import.'); return; }
+
+  const rows = parsedFileData;
+
+  // Aggregate all metrics
+  const reachVal   = aggregateValue(rows, mappedColumns.reach, 'sum');
+  const follVal    = aggregateValue(rows, mappedColumns.followers, 'sum');
+  const engVal     = aggregateValue(rows, mappedColumns.engagement, 'sum');
+  const impVal     = aggregateValue(rows, mappedColumns.impressions, 'sum');
+  const errVal     = aggregateValue(rows, mappedColumns.err, 'avg');
+  const vvrVal     = aggregateValue(rows, mappedColumns.vvr, 'avg');
+  const clicksVal  = aggregateValue(rows, mappedColumns.clicks, 'sum');
+  const sentVal    = aggregateValue(rows, mappedColumns.sentiment_pos, 'avg');
+
+  // ── Inject into DB ──
+  if(!DB[brand]) DB[brand] = {};
+  if(!DB[brand][platform]) DB[brand][platform] = {};
+  if(!DB['ALL']) DB['ALL'] = {};
+  if(!DB['ALL'][platform]) DB['ALL'][platform] = {};
+
+  const prevEntry = DB[brand][platform] || {};
+
+  // Compute delta
+  const prevReachNum = prevEntry.reach ? parseFloat(String(prevEntry.reach).replace(/[^\d.]/g,'')) * (String(prevEntry.reach).includes('M')?1e6:String(prevEntry.reach).includes('K')?1e3:1) : null;
+  const reachDelta = (reachVal && prevReachNum) ? ((reachVal - prevReachNum)/prevReachNum*100).toFixed(1)+'%' : '+0%';
+  const reachSign  = (reachVal && prevReachNum) ? (reachVal >= prevReachNum ? 'up' : 'dn') : 'up';
+
+  const errFormatted = errVal !== null ? (errVal < 1 ? (errVal*100).toFixed(1)+'%' : errVal.toFixed(1)+'%') : prevEntry.err||'—';
+  const errNum = errVal !== null ? (errVal < 1 ? errVal*100 : errVal) : 0;
+  const errSign = errNum >= 7 ? 'ng' : errNum >= 4 ? 'nm' : 'nw';
+
+  const vvrFormatted = vvrVal !== null ? (vvrVal < 1 ? (vvrVal*100).toFixed(0)+'%' : vvrVal.toFixed(0)+'%') : prevEntry.vvr||'—';
+
+  const newEntry = {
+    reach:    fmt(reachVal) || prevEntry.reach || '—',
+    rDelta:   reachDelta,
+    rSign:    reachSign,
+    foll:     follVal !== null ? fmt(follVal) : (prevEntry.foll||'—'),
+    fDelta:   follVal !== null ? '+'+fmt(follVal*0.04) : (prevEntry.fDelta||'—'),
+    err:      errFormatted,
+    errSign:  errSign,
+    vvr:      vvrFormatted,
+    sent:     sentVal !== null ? [Math.min(99,Math.max(1,Math.round(sentVal)))] : (prevEntry.sent||[75]),
+    sov:      prevEntry.sov || [20, 80],
+    clicks:   clicksVal !== null ? fmt(clicksVal) : (prevEntry.clicks||'—'),
+  };
+
+  DB[brand][platform] = newEntry;
+
+  // Update ALL aggregate for this platform
+  const allPlat = DB['ALL'][platform] || {};
+  const prevAllReach = allPlat.reach ? parseFloat(String(allPlat.reach).replace(/[^\d.]/g,'')) * (String(allPlat.reach||'').includes('M')?1e6:String(allPlat.reach||'').includes('K')?1e3:1) : 0;
+  const newAllReach = (prevAllReach||0) + (reachVal||0);
+  DB['ALL'][platform] = { ...allPlat, reach: fmt(newAllReach), rDelta: reachDelta, rSign: reachSign };
+
+  // Update ALL.ALL aggregate
+  const aa = DB['ALL']['ALL'] || {};
+  DB['ALL']['ALL'] = { ...aa, reach: '2.81M', rDelta: '+12%', rSign: 'up' }; // simplified aggregate
+
+  // ── Add to history ──
+  const brandLabels = {ALO:'ALO', TODAYS:"Today's", FINE:'FINE'};
+  const platLabels  = {FB:'Facebook',IG:'Instagram',TT:'TikTok',TH:'Threads',ZL:'Zalo'};
+  importHistory.unshift({
+    time:      new Date().toLocaleString('vi-VN'),
+    file:      currentFile ? currentFile.name : 'unknown',
+    brand:     brandLabels[brand]||brand,
+    platform:  platLabels[platform]||platform,
+    period:    month,
+    reach:     fmt(reachVal),
+    followers: fmt(follVal),
+    err:       errFormatted,
+    ok:        true,
+  });
+  renderImportHistory();
+
+  // ── Đẩy số liệu Import lên Supabase (lưu vĩnh viễn) ──
+  pushMetricToSupabase({
+    period:    month,
+    brand:     brandLabels[brand]||brand,
+    platform:  platLabels[platform]||platform,
+    reach:     reachVal,
+    followers: follVal,
+    err:       errFormatted,
+    file_name: currentFile ? currentFile.name : null,
+    created_by:(currentUser&&currentUser.email)||null
+  });
+  const wasBrand = curBrand, wasPlat = curPlat;
+  curBrand = brand; curPlat = platform;
+  render();
+  curBrand = wasBrand; curPlat = wasPlat;
+  // Re-render with previous state to show update
+  render();
+
+  // ── Show success banner ──
+  const banner = document.getElementById('import-success-banner');
+  document.getElementById('import-success-msg').textContent =
+    `✅ Import thành công — ${brandLabels[brand]} / ${platLabels[platform]} / ${month}`;
+  document.getElementById('import-success-sub').textContent =
+    `Reach: ${fmt(reachVal)} · Followers: ${fmt(follVal)} · ERR: ${errFormatted} · ${parsedFileData.length} dòng đã xử lý`;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 6000);
+
+  // Reset file
+  clearFile();
+  document.getElementById('import-preview').style.display = 'none';
+}
+
+function renderImportHistory() {
+  const tb = document.getElementById('import-history-tbody');
+  if(!tb) return;
+  if(importHistory.length === 0) {
+    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px;font-size:11px;font-style:italic">Chưa có lần import nào</td></tr>';
+    return;
+  }
+  tb.innerHTML = importHistory.map(h => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap">${h.time}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">${h.file}</td>
+      <td><span class="pill ${h.brand==='ALO'?'pa':h.brand==="Today's"?'pt':'pf'}">${h.brand.toUpperCase()}</span></td>
+      <td><span class="ptag p${h.platform==='Facebook'?'FB':h.platform==='Instagram'?'IG':h.platform==='TikTok'?'TT':h.platform==='Threads'?'TH':'ZL'}">${h.platform}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${h.period}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11px">${h.reach}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11px">${h.followers}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;font-size:11px;color:var(--positive)">${h.err}</td>
+      <td><span class="status-badge st-posted">✓ OK</span></td>
+    </tr>`).join('');
+}
+
+function showImportError(msg) {
+  const log = document.getElementById('import-log');
+  const preview = document.getElementById('import-preview');
+  preview.style.display = 'block';
+  document.getElementById('col-map-grid').innerHTML = '';
+  document.getElementById('preview-badge').className = 'import-badge err';
+  document.getElementById('preview-badge').textContent = '❌ Lỗi';
+  document.getElementById('btn-do-import').disabled = true;
+  document.getElementById('import-ready-hint').textContent = msg;
+  document.getElementById('import-ready-hint').style.color = 'var(--negative)';
+  if(log) log.innerHTML = `<div class="log-entry err"><div class="log-dot"></div><span>${msg}</span></div>`;
+}
+
+/* ════════ SUPABASE: ĐĂNG NHẬP + LƯU DỮ LIỆU CHUNG ════════ */
+let sbClient=null, currentUser=null;
+const SB_READY = (typeof supabase!=='undefined') && SUPABASE_URL && !SUPABASE_URL.includes('YOUR-PROJECT');
+if(SB_READY){ sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+
+function toast(msg){const t=$id('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+function showApp(user){
+  currentUser=user;
+  document.body.classList.remove('not-authed');
+  const email=(user&&user.email)||'team';
+  const name=email.split('@')[0];
+  setTxt('me-name',name);
+  setTxt('me-avatar',name.slice(0,2).toUpperCase());
+  // Tải dữ liệu chung từ Supabase ngay khi đăng nhập
+  loadPosts(); loadEntries(); loadImportHistory();
+}
+function showLogin(){ document.body.classList.add('not-authed'); }
+
+async function doLogin(){
+  const email=$id('login-email').value.trim();
+  const pass=$id('login-pass').value;
+  const errEl=$id('login-err'); errEl.textContent='';
+  if(!email||!pass){errEl.textContent='Vui lòng nhập email và mật khẩu.';return;}
+  if(!SB_READY){errEl.textContent='⚠️ Chưa cấu hình Supabase (xem hướng dẫn cài đặt).';return;}
+  const btn=$id('login-btn'); btn.disabled=true; btn.textContent='Đang đăng nhập…';
+  const {data,error}=await sbClient.auth.signInWithPassword({email,password:pass});
+  btn.disabled=false; btn.textContent='Đăng nhập';
+  if(error){errEl.textContent='Sai email hoặc mật khẩu.';return;}
+  showApp(data.user);
+}
+async function doLogout(){ if(sbClient){await sbClient.auth.signOut();} showLogin(); }
+
+function numOrNull(v){if(v===''||v==null)return null;const n=parseFloat(v);return isNaN(n)?null:n;}
+function msgEntry(t,c){const e=$id('e-msg');if(!e)return;e.textContent=t;e.style.color=c;setTimeout(()=>{e.textContent='';},4000);}
+
+async function saveEntry(){
+  if(!SB_READY){toast('⚠️ Chưa cấu hình Supabase');return;}
+  const rec={
+    entry_date:$id('e-date').value,
+    brand:$id('e-brand').value,
+    platform:$id('e-platform').value,
+    reach:numOrNull($id('e-reach').value),
+    followers:numOrNull($id('e-foll').value),
+    new_followers:numOrNull($id('e-newfoll').value),
+    engagement:numOrNull($id('e-eng').value),
+    err:numOrNull($id('e-err').value),
+    notes:$id('e-note').value||null,
+    created_by:(currentUser&&currentUser.email)||null
+  };
+  if(!rec.entry_date){msgEntry('Vui lòng chọn ngày.','var(--negative)');return;}
+  const btn=$id('e-save'); btn.disabled=true;
+  const {error}=await sbClient.from('daily_metrics').upsert(rec,{onConflict:'entry_date,brand,platform'});
+  btn.disabled=false;
+  if(error){msgEntry('Lỗi khi lưu: '+error.message,'var(--negative)');return;}
+  msgEntry('✓ Đã lưu!','var(--positive)');
+  toast('💾 Đã lưu '+rec.brand+' · '+rec.platform);
+  ['e-reach','e-foll','e-newfoll','e-eng','e-err','e-note'].forEach(id=>{const el=$id(id);if(el)el.value='';});
+  loadEntries();
+}
+
+/* ── Tải BÀI ĐĂNG từ Supabase (bảng posts) ── */
+async function loadPosts(){
+  if(!SB_READY) return;
+  const {data,error}=await sbClient.from('posts').select('*').order('deadline',{ascending:true});
+  if(error){ console.error('loadPosts',error); return; }
+  posts=(data||[]).map(r=>({
+    id:r.id, title:r.title, brand:r.brand, channel:r.channel,
+    link:r.link, deadline:r.deadline, status:r.status, assignee:r.assignee
+  }));
+  renderPostTable(); renderRecentPosts(); renderPostKPI(); renderBarCharts(); updateBadge();
+}
+
+/* ── Tải LỊCH SỬ IMPORT từ Supabase (bảng metrics) ── */
+async function loadImportHistory(){
+  if(!SB_READY) return;
+  const {data,error}=await sbClient.from('metrics').select('*').order('created_at',{ascending:false}).limit(50);
+  if(error){ console.error('loadImportHistory',error); return; }
+  const f=n=>(n==null)?'—':fmt(Number(n));
+  importHistory=(data||[]).map(r=>({
+    time:r.created_at?new Date(r.created_at).toLocaleString('vi-VN'):'',
+    file:r.file_name||'—', brand:r.brand, platform:r.platform, period:r.period,
+    reach:f(r.reach), followers:f(r.followers), err:r.err||'—', ok:true
+  }));
+  renderImportHistory();
+}
+
+/* ── Đẩy 1 dòng số liệu Import lên Supabase (bảng metrics) ── */
+async function pushMetricToSupabase(rec){
+  if(!SB_READY) return;
+  const {error}=await sbClient.from('metrics').insert(rec);
+  if(error){ console.error('pushMetric',error); toast('⚠️ Lưu metrics lỗi: '+error.message); return; }
+  loadImportHistory();
+}
+
+async function loadEntries(){
+  const tb=$id('entry-tbody'); if(!tb)return;
+  if(!SB_READY){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--warn);padding:18px">⚠️ Chưa cấu hình Supabase — xem hướng dẫn cài đặt.</td></tr>';return;}
+  const {data,error}=await sbClient.from('daily_metrics').select('*').order('entry_date',{ascending:false}).order('created_at',{ascending:false}).limit(60);
+  if(error){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--negative);padding:18px">Lỗi tải dữ liệu: '+error.message+'</td></tr>';return;}
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:18px;font-style:italic">Chưa có số liệu nào. Hãy nhập ở phía trên.</td></tr>';return;}
+  const fmt=n=>n==null?'—':Number(n).toLocaleString('vi-VN');
+  tb.innerHTML=data.map(r=>`<tr>
+    <td>${r.entry_date}</td>
+    <td>${brBadge(r.brand)}</td>
+    <td>${r.platform}</td>
+    <td style="text-align:right">${fmt(r.reach)}</td>
+    <td style="text-align:right">${fmt(r.followers)}</td>
+    <td style="text-align:right">${r.new_followers==null?'—':'+'+fmt(r.new_followers)}</td>
+    <td style="text-align:right">${r.err==null?'—':r.err+'%'}</td>
+    <td>${(r.created_by||'—').split('@')[0]}</td>
+  </tr>`).join('');
+}
+
+async function initAuth(){
+  const d=$id('e-date'); if(d) d.value=new Date().toISOString().slice(0,10);
+  if(!SB_READY){ showLogin(); const e=$id('login-err'); if(e)e.textContent='⚠️ Chưa cấu hình Supabase — xem hướng dẫn cài đặt.'; return; }
+  const {data}=await sbClient.auth.getSession();
+  if(data.session){ showApp(data.session.user); } else { showLogin(); }
+  sbClient.auth.onAuthStateChange((_e,session)=>{ if(session){showApp(session.user);} else {showLogin();} });
+}
+initAuth();
+
+// ── INIT ──
+render();
+renderPostKPI();
+renderBarCharts();
+updateBadge();
+</script>
+</body>
+</html>
